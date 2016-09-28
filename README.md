@@ -38,10 +38,14 @@ brew install sox
 
 ## Usage 
 
-Add sonus to an existing project:
+Add sonus and your cloud speech recognition system of choice:
 ``` javascript
 const Sonus = require('./index.js');
 const {Models} = require('snowboy');
+const speech = require('@google-cloud/speech')({
+  projectId: 'streaming-speech-sample',
+  keyFilename: './keyfile.json'
+});
 ```
 
 Add your keyword and initialize sonus:
@@ -49,7 +53,7 @@ Add your keyword and initialize sonus:
 const models = new Models();
 models.add({ file: 'resources/snowboy.umdl', hotwords: 'snowboy' });
 
-const sonus = new Sonus({ models: models });
+const sonus = new Sonus({ models: models }, speech);
 ```
 
 Create your own Alexa in less than 10 lines of code:
@@ -77,5 +81,5 @@ Licensed under [MIT](https://github.com/evancohen/sonus/blob/master/LICENSE).
 
 ## Todo
 
-- [ ] Integrate a simple command registration system (Annyang?)
+- [ ] Create a shim for annyang as an example for a simple command registration system
 - [ ] Clean up interface so it's even eaiser to use

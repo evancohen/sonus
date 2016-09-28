@@ -1,30 +1,24 @@
-'use strict';
-// Google Speech Dependencies
-const speech = require('@google-cloud/speech')({
-  projectId: 'streaming-speech-sample',
-  keyFilename: './keyfile.json'
-});
+'use strict'
 
-//Sonus dependencies
-const record = require('node-record-lpcm16');
-const stream = require('stream');
-const {Detector} = require('snowboy');
+const record = require('node-record-lpcm16')
+const stream = require('stream')
+const {Detector} = require('snowboy')
 
-// Streaming: Google Speech Recognition
-class GoogleSpeechRecognition extends stream.Writable {
-  constructor() {
-    super();
+class CloudSpeechRecognizer extends stream.Writable {
+  constructor(recognizer) {
+    super()
     this.listening = false
+    this.recognizer = recognizer
   }
 
   startStreaming(audioStream) {
-    const _self = this;
+    const _self = this
     if (_self.listening)
-      return;
+      return
 
-    _self.listening = true;
+    _self.listening = true
 
-    const recognitionStream = speech.createRecognizeStream({
+    const recognitionStream = _self.recognizer.createRecognizeStream({
       config: {
         encoding: 'LINEAR16',
         sampleRate: 16000
@@ -32,58 +26,61 @@ class GoogleSpeechRecognition extends stream.Writable {
       singleUtterance: true,
       interimResults: true,
       verbose: true
-    });
+    })
 
     recognitionStream.on('error', function (error) {
-      _self.emit('error', error);
+      _self.emit('error', error)
     })
 
     recognitionStream.on('data', function (data) {
       if (data) {
-        _self.emit('data', data);
+        _self.emit('data', data)
         if (data.endpointerType == 'END_OF_AUDIO') {
-          _self.listening = false;
+          _self.listening = false
         }
       }
     })
 
-    audioStream.pipe(recognitionStream);
+    audioStream.pipe(recognitionStream)
   }
 }
 
 class Sonus extends stream.Writable {
-  constructor(options) {
-    super();
-    const _self = this;
-    _self.mic = {};
-    _self.detector = new Detector(options);
-    _self._gs = new GoogleSpeechRecognition();
+  constructor(options, recognizer) {
+    super()
+    const _self = this
+    _self.mic = {}
+    _self.csr = new CloudSpeechRecognizer(recognizer)
 
-    // Forward event emitters
+    options.resource = options.resource || "node_modules/snowboy/resources/common.res"
+    options.audioGain = options.audioGain || 2.0
+
+    _self.detector = new Detector(options)
+
     this.detector.on('silence', function () {
-      _self.emit('silence');
+      _self.emit('silence')
     })
 
     this.detector.on('sound', function () {
-      _self.emit('sound');
+      _self.emit('sound')
     })
 
     // When a hotword is detected pipe the audio stream to speech detection
     this.detector.on('hotword', function (index, hotword) {
       _self.emit('hotword', index, hotword)
-      _self._gs.startStreaming(_self.mic);
+      _self.csr.startStreaming(_self.mic)
     })
 
-    this._gs.on('error', function (error) {
-      _self.emit('error', { streamingError: error });
+    this.csr.on('error', function (error) {
+      _self.emit('error', { streamingError: error })
     })
 
-    this._gs.on('data', function (data) {
+    this.csr.on('data', function (data) {
       if (data.results[0]) {
         if (data.results[0].isFinal) {
-          _self.emit('final-result', data.results[0].transcript);
+          _self.emit('final-result', data.results[0].transcript)
         } else {
-          _self.emit('partial-result', data.results[0].transcript);
+          _self.emit('partial-result', data.results[0].transcript)
         }
       }
     })
@@ -93,14 +90,14 @@ class Sonus extends stream.Writable {
     this.mic = record.start({
       threshold: 0,
       verbose: false
-    });
-    this.mic.pipe(this.detector);
+    })
+    this.mic.pipe(this.detector)
   }
 
   stop() {
-    record.stop();
+    record.stop()
   }
 
 }
 
-module.exports = Sonus;
+module.exports = Sonus
