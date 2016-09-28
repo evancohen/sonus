@@ -8,7 +8,7 @@ Just like Alexa, Google Now, and Siri, sonus is always listening offline for a c
 - [X] macOS
 - [ ] Windows
 
-### Streaming Recognition Services**
+### Streaming Recognition Services
 
 - [X] Google Cloud Speech
 - [ ] Alexa Voice Services
@@ -67,6 +67,13 @@ sonus.on('final-result', function (result) {
   }
 })
 ```
+
+## Author
+Evan Cohen: [@_evnc](https://twitter.com/_evnc)
+
+## License
+Licensed under [MIT](https://github.com/evancohen/sonus/blob/master/LICENSE).
+
 
 ## Todo
 
