@@ -40,7 +40,7 @@ brew install sox
 
 Add sonus and your cloud speech recognition system of choice:
 ``` javascript
-const Sonus = require('./index.js');
+const Sonus = require('sonus');
 const {Models} = require('snowboy');
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
