@@ -14,12 +14,17 @@ const {Detector} = require('snowboy');
 class GoogleSpeechRecognition extends stream.Writable {
   constructor() {
     super();
+    this.listening = false
   }
 
   startStreaming(audioStream) {
     const _self = this;
+    if (_self.listening)
+      return;
 
-    audioStream.pipe(speech.createRecognizeStream({
+    _self.listening = true;
+
+    const recognitionStream = speech.createRecognizeStream({
       config: {
         encoding: 'LINEAR16',
         sampleRate: 16000
@@ -27,70 +32,69 @@ class GoogleSpeechRecognition extends stream.Writable {
       singleUtterance: true,
       interimResults: true,
       verbose: true
-    }))
-    .on('error', function(error){
+    });
+
+    recognitionStream.on('error', function (error) {
       _self.emit('error', error);
     })
-    .on('data', function(data) {
+
+    recognitionStream.on('data', function (data) {
       if (data) {
         _self.emit('data', data);
+        if (data.endpointerType == 'END_OF_AUDIO') {
+          _self.listening = false;
+        }
       }
-    });
+    })
+
+    audioStream.pipe(recognitionStream);
   }
 }
 
-
-
-// BEGIN SONUS
 class Sonus extends stream.Writable {
   constructor(options) {
     super();
-
     const _self = this;
-    // Set up Snowboy
-    this._mic = {};
-    this._detector = new Detector(options);
-    this._gs = new GoogleSpeechRecognition();
+    _self.mic = {};
+    _self.detector = new Detector(options);
+    _self._gs = new GoogleSpeechRecognition();
 
-    this._detector.on('silence', function () {
+    // Forward event emitters
+    this.detector.on('silence', function () {
       _self.emit('silence');
     })
 
-    this._detector.on('sound', function () {
+    this.detector.on('sound', function () {
       _self.emit('sound');
     })
 
     // When a hotword is detected pipe the audio stream to speech detection
-    this._detector.on('hotword', function (index, hotword) {
+    this.detector.on('hotword', function (index, hotword) {
       _self.emit('hotword', index, hotword)
-      _self._gs.startStreaming(_self._mic);
-    });
+      _self._gs.startStreaming(_self.mic);
+    })
 
     this._gs.on('error', function (error) {
       _self.emit('error', { streamingError: error });
-    });
+    })
 
     this._gs.on('data', function (data) {
-      if (data.results[0]){
-        if(data.results[0].isFinal){
-           _self.emit('final-result', data.results[0].transcript);
+      if (data.results[0]) {
+        if (data.results[0].isFinal) {
+          _self.emit('final-result', data.results[0].transcript);
         } else {
-           _self.emit('partial-result', data.results[0].transcript);
+          _self.emit('partial-result', data.results[0].transcript);
         }
       }
-    });
-    this._gs.on('end', function () {
-      //Nothing to do here
-      console.log("TIME TO UNPIPE")
-    });
+    })
   }
 
   start() {
-    this._mic = record.start({
+    this.mic = record.start({
       threshold: 0,
       verbose: false
     });
-    this._mic.pipe(this._detector);
+    this.mic.pipe(this.detector);
   }
 
   stop() {
