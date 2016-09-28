@@ -26,13 +26,9 @@
   },
   "homepage": "https://github.com/evancohen/sonus#readme",
   "dependencies": {
-    "async": "^2.0.1",
-    "google-auto-auth": "^0.2.4",
-    "google-proto-files": "^0.3.0",
-    "googleapis": "^12.0.0",
-    "grpc": "^0.15.0",
+    "@google-cloud/speech": "^0.2.0",
     "node-record-lpcm16": "^0.1.4",
-    "snowboy": "1.0.7",
+    "snowboy": "^1.1.0",
     "stream": "0.0.2"
   }
 }

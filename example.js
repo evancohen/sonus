@@ -1,12 +1,10 @@
 const Sonus = require('./index.js');
+const {Models} = require('snowboy');
 
-const sonus = new Sonus({
-  resource: "resources/common.res",
-  model: "resources/snowboy.umdl",
-  sensitivity: "0.5",
-  audioGain: 2.0
-})
+const models = new Models();
+models.add({file: 'resources/snowboy.umdl', sensitivity: '0.5', hotwords : 'snowboy'});
 
+const sonus = new Sonus({resource: "resources/common.res", models: models, audioGain: 2.0});
 sonus.start();
 
 sonus.on('partial-result', function(result) {
@@ -15,7 +13,7 @@ sonus.on('partial-result', function(result) {
 
 sonus.on('final-result', function(result) {
   console.log("Final", result);
-  if(result.transcript.includes("exit")){
+  if(result.includes("stop")){
     sonus.stop();
   }
 })

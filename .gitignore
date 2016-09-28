@@ -38,3 +38,6 @@ jspm_packages
 
 # VS Code
 .vscode
+
+# Keyfile
+keyfile.json
