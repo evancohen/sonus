@@ -30,5 +30,8 @@
     "node-record-lpcm16": "^0.1.4",
     "snowboy": "^1.1.0",
     "stream": "0.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^3.7.0"
   }
 }
