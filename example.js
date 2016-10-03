@@ -8,8 +8,8 @@ const speech = require('@google-cloud/speech')({
 const models = new Models()
 models.add({ file: 'resources/snowboy.umdl', hotwords: 'snowboy' })
 
-const sonus = new Sonus({ models: models }, speech)
-sonus.start()
+const sonus = Sonus.init({ models: models }, speech)
+Sonus.start(sonus)
 
 console.log('Say "snowboy"...')
 
@@ -24,6 +24,6 @@ sonus.on('partial-result', function (result) {
 sonus.on('final-result', function (result) {
   console.log("Final", result)
   if (result.includes("stop")) {
-    sonus.stop()
+    Sonus.stop()
   }
 })
