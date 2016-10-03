@@ -4,100 +4,95 @@ const record = require('node-record-lpcm16')
 const stream = require('stream')
 const {Detector} = require('snowboy')
 
-class CloudSpeechRecognizer extends stream.Writable {
-  constructor(recognizer) {
-    super()
-    this.listening = false
-    this.recognizer = recognizer
-  }
-
-  startStreaming(audioStream) {
-    const _self = this
-    if (_self.listening)
-      return
-
-    _self.listening = true
-
-    const recognitionStream = _self.recognizer.createRecognizeStream({
-      config: {
-        encoding: 'LINEAR16',
-        sampleRate: 16000
-      },
-      singleUtterance: true,
-      interimResults: true,
-      verbose: true
-    })
-
-    recognitionStream.on('error', function (error) {
-      _self.emit('error', error)
-    })
-
-    recognitionStream.on('data', function (data) {
-      if (data) {
-        _self.emit('data', data)
-        if (data.endpointerType == 'END_OF_AUDIO') {
-          _self.listening = false
-        }
-      }
-    })
-
-    audioStream.pipe(recognitionStream)
-  }
+const CloudSpeechRecognizer = {}
+CloudSpeechRecognizer.init = recognizer => {
+  const csr = new stream.Writable()
+  csr.listening = false
+  csr.recognizer = recognizer
+  return csr
 }
 
-class Sonus extends stream.Writable {
-  constructor(options, recognizer) {
-    super()
-    const _self = this
-    _self.mic = {}
-    _self.csr = new CloudSpeechRecognizer(recognizer)
+CloudSpeechRecognizer.startStreaming = (audioStream, cloudSpeechRecognizer) => {
+  if (cloudSpeechRecognizer.listening) {
+    return
+  }
 
-    options.resource = options.resource || "node_modules/snowboy/resources/common.res"
-    options.audioGain = options.audioGain || 2.0
+  cloudSpeechRecognizer.listening = true
 
-    _self.detector = new Detector(options)
+  const recognizer = cloudSpeechRecognizer.recognizer
+  const recognitionStream = recognizer.createRecognizeStream({
+    config: {
+      encoding: 'LINEAR16',
+      sampleRate: 16000
+    },
+    singleUtterance: true,
+    interimResults: true,
+    verbose: true
+  })
 
-    this.detector.on('silence', function () {
-      _self.emit('silence')
-    })
+  recognitionStream.on('error', err => cloudSpeechRecognizer.emit('error', err))
 
-    this.detector.on('sound', function () {
-      _self.emit('sound')
-    })
 
-    // When a hotword is detected pipe the audio stream to speech detection
-    this.detector.on('hotword', function (index, hotword) {
-      _self.emit('hotword', index, hotword)
-      _self.csr.startStreaming(_self.mic)
-    })
-
-    this.csr.on('error', function (error) {
-      _self.emit('error', { streamingError: error })
-    })
-
-    this.csr.on('data', function (data) {
-      if (data.results[0]) {
-        if (data.results[0].isFinal) {
-          _self.emit('final-result', data.results[0].transcript)
-        } else {
-          _self.emit('partial-result', data.results[0].transcript)
-        }
+  recognitionStream.on('data', data => {
+    if (data) {
+      cloudSpeechRecognizer.emit('data', data)
+      if (data.endpointerType === 'END_OF_AUDIO') {
+        cloudSpeechRecognizer.listening = false
       }
-    })
-  }
+    }
+  })
 
-  start() {
-    this.mic = record.start({
-      threshold: 0,
-      verbose: false
-    })
-    this.mic.pipe(this.detector)
-  }
-
-  stop() {
-    record.stop()
-  }
-
+  audioStream.pipe(recognitionStream)
 }
+
+const Sonus = {}
+Sonus.init = (options, recognizer) => {
+  // don't mutate options
+  const opts = Object.assign({}, options)
+
+  const sonus = new stream.Writable()
+  sonus.mic = {}
+  const csr = CloudSpeechRecognizer.init(recognizer)
+
+  // defaults
+  opts.resource = options.resource || 'node_modules/snowboy/resources/common.res'
+  opts.audioGain = options.audioGain || 2.0
+
+  const detector = sonus.detector = new Detector(opts)
+
+  detector.on('silence', () => sonus.emit('silence'))
+  detector.on('sound', () => sonus.emit('sound'))
+
+  // When a hotword is detected pipe the audio stream to speech detection
+  detector.on('hotword', (index, hotword) => {
+    sonus.emit('hotword', index, hotword)
+    CloudSpeechRecognizer.startStreaming(sonus.mic, csr)
+  })
+
+  csr.on('error', error => sonus.emit('error', { streamingError: error }))
+
+  csr.on('data', data => {
+    const result = data.results[0]
+    if (result) {
+      if (result.isFinal) {
+        sonus.emit('final-result', result.transcript)
+      } else {
+        sonus.emit('partial-result', result.transcript)
+      }
+    }
+  })
+  return sonus
+}
+
+Sonus.start = sonus => {
+  sonus.mic = record.start({
+    threshold: 0,
+    verbose: false
+  })
+
+  sonus.mic.pipe(sonus.detector)
+}
+
+Sonus.stop = () => record.stop()
 
 module.exports = Sonus
