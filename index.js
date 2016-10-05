@@ -2,7 +2,7 @@
 
 const record = require('node-record-lpcm16')
 const stream = require('stream')
-const {Detector} = require('snowboy')
+const {Detector, Models} = require('snowboy')
 
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
@@ -12,7 +12,7 @@ CloudSpeechRecognizer.init = recognizer => {
   return csr
 }
 
-CloudSpeechRecognizer.startStreaming = (audioStream, cloudSpeechRecognizer) => {
+CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecognizer) => {
   if (cloudSpeechRecognizer.listening) {
     return
   }
@@ -23,7 +23,8 @@ CloudSpeechRecognizer.startStreaming = (audioStream, cloudSpeechRecognizer) => {
   const recognitionStream = recognizer.createRecognizeStream({
     config: {
       encoding: 'LINEAR16',
-      sampleRate: 16000
+      sampleRate: 16000,
+      languageCode: options.language
     },
     singleUtterance: true,
     interimResults: true,
@@ -48,15 +49,26 @@ CloudSpeechRecognizer.startStreaming = (audioStream, cloudSpeechRecognizer) => {
 const Sonus = {}
 Sonus.init = (options, recognizer) => {
   // don't mutate options
-  const opts = Object.assign({}, options)
-
-  const sonus = new stream.Writable()
+  const opts = Object.assign({}, options),
+    models = new Models(),
+    sonus = new stream.Writable(),
+    csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
-  const csr = CloudSpeechRecognizer.init(recognizer)
+  
+  opts.hotwords = opts.hotwords || [1]
+  opts.hotwords.forEach(model => {
+    models.add({
+      file: model.file || 'node_modules/snowboy/resources/snowboy.umdl',
+      sensitivity: model.sensitivity || '0.5',
+      hotwords : model.hotword || 'default'
+    })
+  })
 
   // defaults
-  opts.resource = options.resource || 'node_modules/snowboy/resources/common.res'
-  opts.audioGain = options.audioGain || 2.0
+  opts.models = models
+  opts.resource = opts.resource  || 'node_modules/snowboy/resources/common.res'
+  opts.audioGain = opts.audioGain  || 2.0
+  opts.language = opts.language || 'en-US' //https://cloud.google.com/speech/docs/languages
 
   const detector = sonus.detector = new Detector(opts)
 
@@ -66,7 +78,7 @@ Sonus.init = (options, recognizer) => {
   // When a hotword is detected pipe the audio stream to speech detection
   detector.on('hotword', (index, hotword) => {
     sonus.emit('hotword', index, hotword)
-    CloudSpeechRecognizer.startStreaming(sonus.mic, csr)
+    CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
   })
 
   csr.on('error', error => sonus.emit('error', { streamingError: error }))

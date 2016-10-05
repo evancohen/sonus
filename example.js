@@ -1,27 +1,23 @@
+'use strict'
+
 const Sonus = require('./index.js')
-const {Models} = require('snowboy')
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
   keyFilename: './keyfile.json'
 })
 
-const models = new Models()
-models.add({ file: 'resources/snowboy.umdl', hotwords: 'snowboy' })
+const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }]
+const language = "en-US"
+const sonus = Sonus.init({ hotwords, language }, speech)
 
-const sonus = Sonus.init({ models: models }, speech)
 Sonus.start(sonus)
-
 console.log('Say "snowboy"...')
 
-sonus.on('hotword', function (index, keyword) {
-  console.log("!")
-})
+sonus.on('hotword', (index, keyword) => console.log("!"))
 
-sonus.on('partial-result', function (result) {
-  console.log("Partial", result)
-})
+sonus.on('partial-result', result => console.log("Partial", result))
 
-sonus.on('final-result', function (result) {
+sonus.on('final-result', result => {
   console.log("Final", result)
   if (result.includes("stop")) {
     Sonus.stop()

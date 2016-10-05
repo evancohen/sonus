@@ -1,5 +1,5 @@
 # sonus
-Just like Alexa, Google Now, and Siri, sonus is always listening offline for a customizable hotword. Once that hotword is detected, sonus streams what you say to the speech recognition service of your choice and gives you the results. 
+Just like Alexa, Google Now, and Siri, sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results [#withsonus](https://twitter.com/hashtag/withsonus?src=github).
 
 **This project is in active development, it's not quite ready for prime time**
 
@@ -19,7 +19,7 @@ Just like Alexa, Google Now, and Siri, sonus is always listening offline for a c
 ## Installation
 
 ```
-npm install sonus
+npm install --save sonus
 ```
 
 ## Dependencies
@@ -41,7 +41,6 @@ brew install sox
 Add sonus and your cloud speech recognition system of choice:
 ``` javascript
 const Sonus = require('sonus');
-const {Models} = require('snowboy');
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
   keyFilename: './keyfile.json'
@@ -50,36 +49,24 @@ const speech = require('@google-cloud/speech')({
 
 Add your keyword and initialize sonus:
 ``` javascript
-const models = new Models();
-models.add({ file: 'resources/snowboy.umdl', hotwords: 'snowboy' });
+const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }]
 
-const sonus = new Sonus({ models: models }, speech);
+const sonus = Sonus.init({ hotwords }, speech)
 ```
 
-Create your own Alexa in less than 10 lines of code:
+Create your own Alexa in less than a tweet:
 ``` javascript
-sonus.start(); //start listening
+Sonus.start(sonus)
 
-sonus.on('hotword', function (index, keyword) {
-  console.log("!");
-})
+sonus.on('hotword', (index, keyword) => console.log("!"))
 
-sonus.on('final-result', function (result) {
-  console.log(result);
-  if (result.includes("stop")) {
-    sonus.stop(); //stop listening
-  }
-})
+sonus.on('final-result', console.log)
+
 ```
 
-## Author
+## Authors
 Evan Cohen: [@_evnc](https://twitter.com/_evnc)
+Ashish Chandwani: [@ashishschandwa1](https://twitter.com/ashishschandwa1)
 
 ## License
 Licensed under [MIT](https://github.com/evancohen/sonus/blob/master/LICENSE).
-
-
-## Todo
-
-- [ ] Create a shim for annyang as an example for a simple command registration system
-- [ ] Clean up interface so it's even eaiser to use
