@@ -55,6 +55,7 @@ Sonus.init = (options, recognizer) => {
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
   
+  // If we don't have any hotwords passed in, add the default global model
   opts.hotwords = opts.hotwords || [1]
   opts.hotwords.forEach(model => {
     models.add({
