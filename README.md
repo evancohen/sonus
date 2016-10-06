@@ -65,7 +65,7 @@ sonus.on('final-result', console.log)
 ```
 
 ## Authors
-Evan Cohen: [@_evnc](https://twitter.com/_evnc)
+Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
 Ashish Chandwani: [@ashishschandwa1](https://twitter.com/ashishschandwa1)
 
 ## License
