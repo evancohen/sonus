@@ -1,10 +1,15 @@
 <p align="center">
 <img src="./sonus.png" alt="sonus" />
 </p>
+<p align="center">
+<a href="https://travis-ci.org/evancohen/sonus"><img src="https://api.travis-ci.org/evancohen/sonus.svg?branch=master" alt="Build Status"/></a>
+<a href="https://codeclimate.com/github/evancohen/sonus"><img src="https://codeclimate.com/github/evancohen/sonus/badges/gpa.svg" /></a>
+<a href='https://dependencyci.com/github/evancohen/sonus'><img src='https://dependencyci.com/github/evancohen/sonus/badge' alt='Dependency Status'/></a>
+</p>
 
 Just like Alexa, Google Now, and Siri, sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results [#withsonus](https://twitter.com/hashtag/withsonus?src=github).
 
-**This project is in active development, it's not quite ready for prime time**
+**This project is in active development, it's not quite ready for prime time.**
 
 ### Platform Support 
 - [X] Linux - most major distros (Including Raspbian)
