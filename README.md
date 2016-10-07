@@ -1,6 +1,7 @@
 <p align="center">
-<img src="https://github.com/evancohen/sonus/raw/master/sonus.png" data-canonical-src="https://github.com/evancohen/sonus/raw/master/sonus.png" height="160" />
+<img src="./sonus.png" alt="sonus" />
 </p>
+
 Just like Alexa, Google Now, and Siri, sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results [#withsonus](https://twitter.com/hashtag/withsonus?src=github).
 
 **This project is in active development, it's not quite ready for prime time**
