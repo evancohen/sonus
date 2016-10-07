@@ -13,7 +13,7 @@ const sonus = Sonus.init({ hotwords, language }, speech)
 Sonus.start(sonus)
 console.log('Say "' + hotwords[0].hotword + '"...')
 
-sonus.on('hotword', (index, keyword) => console.log("!"))
+sonus.on('hotword', (index, keyword) => console.log("!" + keyword))
 
 sonus.on('partial-result', result => console.log("Partial", result))
 
