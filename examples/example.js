@@ -1,12 +1,13 @@
 'use strict'
 
-const Sonus = require('./index.js')
+const ROOT_DIR = __dirname + '/../'
+const Sonus = require(ROOT_DIR + 'index.js')
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
-  keyFilename: './keyfile.json'
+  keyFilename: ROOT_DIR + 'keyfile.json'
 })
 
-const hotwords = [{ file: 'resources/sonus.pmdl', hotword: 'sonus' }]
+const hotwords = [{ file: ROOT_DIR + 'resources/sonus.pmdl', hotword: 'sonus' }]
 const language = "en-US"
 const sonus = Sonus.init({ hotwords, language }, speech)
 
