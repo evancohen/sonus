@@ -6,10 +6,11 @@
 <a href="https://codeclimate.com/github/evancohen/sonus"><img src="https://codeclimate.com/github/evancohen/sonus/badges/gpa.svg" /></a>
 <a href='https://dependencyci.com/github/evancohen/sonus'><img src='https://dependencyci.com/github/evancohen/sonus/badge' alt='Dependency Status'/></a>
 </p>
+<p align="center">
+<strong>This project is in active development and is rapidly evolving.  As of <code>v0.1.0</code> it uses semantic versioning.</strong>
+</p>
 
-Just like Alexa, Google Now, and Siri, sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results [#withsonus](https://twitter.com/hashtag/withsonus?src=github).
-
-**This project is in active development, it's not quite ready for prime time.**
+Sonus is a speech to text library you can use to quickly and easally add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Now, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results.
 
 ### Platform Support 
 - [X] Linux - most major distros (Including Raspbian)
@@ -48,29 +49,27 @@ brew install sox
 
 Add sonus and your cloud speech recognition system of choice:
 ``` javascript
-const Sonus = require('sonus');
+const Sonus = require('sonus')
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
   keyFilename: './keyfile.json'
-});
+})
 ```
 
-Add your keyword and initialize sonus:
+Add your keyword and initialize Sonus:
 ``` javascript
-const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }]
-
-const sonus = Sonus.init({ hotwords }, speech)
+const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }] 
+const sonus = Sonus.init({ hotwords }, speech) 
 ```
 
 Create your own Alexa in less than a tweet:
 ``` javascript
-Sonus.start(sonus)
-
-sonus.on('hotword', (index, keyword) => console.log("!"))
-
-sonus.on('final-result', console.log)
-
+Sonus.start(sonus) 
+sonus.on('hotword', (index, keyword) => console.log("!")) 
+sonus.on('final-result', console.log) 
 ```
+## Built [#withsonus](https://twitter.com/hashtag/withsonus?src=github)
+*If you build a project with Sonus send a PR and include it here!*
 
 ## Authors
 Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
