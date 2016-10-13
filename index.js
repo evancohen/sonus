@@ -47,6 +47,8 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
 }
 
 const Sonus = {}
+Sonus.annyang = require('./lib/annyang-core.js')
+
 Sonus.init = (options, recognizer) => {
   // don't mutate options
   const opts = Object.assign({}, options),
@@ -54,21 +56,21 @@ Sonus.init = (options, recognizer) => {
     sonus = new stream.Writable(),
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
-  
+
   // If we don't have any hotwords passed in, add the default global model
   opts.hotwords = opts.hotwords || [1]
   opts.hotwords.forEach(model => {
     models.add({
       file: model.file || 'node_modules/snowboy/resources/snowboy.umdl',
       sensitivity: model.sensitivity || '0.5',
-      hotwords : model.hotword || 'default'
+      hotwords: model.hotword || 'default'
     })
   })
 
   // defaults
   opts.models = models
-  opts.resource = opts.resource  || 'node_modules/snowboy/resources/common.res'
-  opts.audioGain = opts.audioGain  || 2.0
+  opts.resource = opts.resource || 'node_modules/snowboy/resources/common.res'
+  opts.audioGain = opts.audioGain || 2.0
   opts.language = opts.language || 'en-US' //https://cloud.google.com/speech/docs/languages
 
   const detector = sonus.detector = new Detector(opts)
@@ -89,6 +91,7 @@ Sonus.init = (options, recognizer) => {
     if (result) {
       if (result.isFinal) {
         sonus.emit('final-result', result.transcript)
+        Sonus.annyang.trigger(result.transcript)
       } else {
         sonus.emit('partial-result', result.transcript)
       }
