@@ -109,6 +109,10 @@ Sonus.start = sonus => {
   sonus.mic.pipe(sonus.detector)
 }
 
+Sonus.pause = sonus => sonus.mic.pause()
+
+Sonus.resume = sonus => sonus.mic.resume()
+
 Sonus.stop = () => record.stop()
 
 module.exports = Sonus
