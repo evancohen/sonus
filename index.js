@@ -124,7 +124,7 @@ Sonus.start = sonus => {
   sonus.started = true
 }
 
-Sonus.trigger = sonus => sonus.trigger()
+Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
 Sonus.pause = sonus => sonus.mic.pause()
 

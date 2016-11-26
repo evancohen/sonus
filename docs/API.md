@@ -28,7 +28,7 @@ const hotwords = [
     {file: 'snowboy.umdl', hotword: 'snowboy'}]
 ```
 
-### Lenguages
+### Languages
 Sonus lets you customize the lenguage for streaming speech recognition. For details on supported lenguages see the docs for your streaming speech recognizer
 
 **Example:** (to be passed into the sonus constructor)  
