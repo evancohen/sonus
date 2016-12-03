@@ -1,6 +1,6 @@
 'use strict'
 
-const record = require('node-record-lpcm16')
+const record = require('./lib/record.js')
 const stream = require('stream')
 const {Detector, Models} = require('snowboy')
 
