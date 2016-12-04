@@ -1,6 +1,6 @@
 {
   "name": "sonus",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Open source cross platform decentralized always-on speech recognition framework",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
   "homepage": "https://github.com/evancohen/sonus#readme",
   "dependencies": {
     "@google-cloud/speech": "^0.2.0",
-    "node-record-lpcm16": "^0.1.4",
+    "node-record-lpcm16": "^0.1.7",
     "snowboy": "^1.1.0",
     "stream": "0.0.2"
   },
