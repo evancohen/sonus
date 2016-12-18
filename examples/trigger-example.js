@@ -12,7 +12,7 @@ const language = "en-US"
 const sonus = Sonus.init({ hotwords, language }, speech)
 
 try{
-  Sonus.trigger(sonus)
+  Sonus.trigger(sonus, 1)
 } catch (e) {
   console.log('Triggering Sonus before starting it will throw the following exception:', e)
 }
@@ -32,5 +32,11 @@ sonus.on('final-result', result => {
   }
 })
 
+try{
+  Sonus.trigger(sonus, 2)
+} catch (e) {
+  console.log('Triggering Sonus with an invalid index will throw the following error:', e)
+}
+
 //Will use index 0 with a hotword of "triggered" and start streaming immedietly
-Sonus.trigger(sonus)
+Sonus.trigger(sonus, 0, "some hotword")

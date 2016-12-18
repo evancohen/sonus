@@ -5,7 +5,8 @@ const stream = require('stream')
 const {Detector, Models} = require('snowboy')
 
 const ERROR = {
-  NOT_STARTED : "NOT_STARTED"
+  NOT_STARTED : "NOT_STARTED",
+  INVALID_INDEX : "INVALID_INDEX"
 }
 
 const CloudSpeechRecognizer = {}
@@ -104,8 +105,13 @@ Sonus.init = (options, recognizer) => {
 
   sonus.trigger = (index, hotword) => {
     if(sonus.started){
-      sonus.emit('hotword', index || "0", hotword || "triggered")
-      CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+      try{
+        let triggerHotword = (index == 0)? hotword : models.lookup(index)
+        sonus.emit('hotword', index, triggerHotword)
+        CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+      } catch (e) {
+        throw ERROR.INVALID_INDEX
+      }
     } else {
       throw ERROR.NOT_STARTED
     }

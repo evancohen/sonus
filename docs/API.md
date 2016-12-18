@@ -80,21 +80,31 @@ Sonus.stop(sonus)
 Note that after recognition is stopped it can not be started again without creating an enterly new sonus instance.
 
 ### Trigger keyword/hotword manually
-You can manuall trigger a hotword by passing your initialized sonus object into `Sonus.trigger`
-This will throw a `NOT_STARTED` exception if you have not started sonus when this is called. 
+You can manuall trigger a hotword by passing your initialized sonus object and an index into `Sonus.trigger`
+The indexes of your hotwords are base 1 and are deturmined by the order in which the hotwords are passed into `Sonus.init`
+
+**Exceptions**
+- `NOT_STARTED` - will be thrown if you have not started sonus when this is called.
+- `INVALID_INDEX` - will be thrown if you pass an invalid index.
 
 **Example:**
 ``` javascript
-Sonus.trigger(sonus)
+Sonus.trigger(sonus, 1)
 ```
-sonus will be triggered with a hotword index of `0` and a hotword of `"triggered"`
+sonus will be triggered with a hotword index of `1`
 
-While it's not officially supported, If you want to trigger a specific index/hotword you can call `trigger` directly on the initialized sonus object 
+You can also optionally specify an index of `0` and an arbitrary hotword that will be returned in the `hotword` event
 **Example:**
 ``` javascript
-sonus.trigger(0, 'hotword')
+sonus.trigger(sonus, 0, 'some hotword')
 ```
+sonus will be triggered with a hotword index of `1` and a hotword of `some hotword`
 
+Passing a hotword with a valid index will override the hotword name and trigger that hotword
+**Example:**
+``` javascript
+sonus.trigger(sonus, 1, 'override')
+```
 ## Events
 hotword
 partial-result
