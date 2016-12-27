@@ -4,6 +4,11 @@ const record = require('node-record-lpcm16')
 const stream = require('stream')
 const {Detector, Models} = require('snowboy')
 
+const ERROR = {
+  NOT_STARTED : "NOT_STARTED",
+  INVALID_INDEX : "INVALID_INDEX"
+}
+
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
@@ -56,6 +61,7 @@ Sonus.init = (options, recognizer) => {
     sonus = new stream.Writable(),
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
+  sonus.started = false
 
   // If we don't have any hotwords passed in, add the default global model
   opts.hotwords = opts.hotwords || [1]
@@ -80,8 +86,7 @@ Sonus.init = (options, recognizer) => {
 
   // When a hotword is detected pipe the audio stream to speech detection
   detector.on('hotword', (index, hotword) => {
-    sonus.emit('hotword', index, hotword)
-    CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+    sonus.trigger(index, hotword)
   })
 
   csr.on('error', error => sonus.emit('error', { streamingError: error }))
@@ -97,6 +102,21 @@ Sonus.init = (options, recognizer) => {
       }
     }
   })
+
+  sonus.trigger = (index, hotword) => {
+    if(sonus.started){
+      try{
+        let triggerHotword = (index == 0)? hotword : models.lookup(index)
+        sonus.emit('hotword', index, triggerHotword)
+        CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+      } catch (e) {
+        throw ERROR.INVALID_INDEX
+      }
+    } else {
+      throw ERROR.NOT_STARTED
+    }
+  }
+
   return sonus
 }
 
@@ -107,7 +127,10 @@ Sonus.start = sonus => {
   })
 
   sonus.mic.pipe(sonus.detector)
+  sonus.started = true
 }
+
+Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
 Sonus.pause = sonus => sonus.mic.pause()
 
