@@ -95,7 +95,6 @@ Sonus.init = (options, recognizer) => {
   let transcriptEmpty = true
   csr.on('data', data => {
     const result = data.results[0]
-    const finalEmpty = (data.endpointerType === 'END_OF_UTTERANCE' && transcriptEmpty)
     if (result) {
       transcriptEmpty = false
       if (result.isFinal) {
@@ -105,7 +104,7 @@ Sonus.init = (options, recognizer) => {
       } else {
         sonus.emit('partial-result', result.transcript)
       }
-    } else if (finalEmpty) {
+    } else if (data.endpointerType === 'END_OF_UTTERANCE' && transcriptEmpty) {
       sonus.emit('final-result', "")
     }
   })
