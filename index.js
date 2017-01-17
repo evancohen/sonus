@@ -3,11 +3,15 @@
 const record = require('node-record-lpcm16')
 const stream = require('stream')
 const {Detector, Models} = require('snowboy')
+const BufferStream = require('./ringbuffer.js')
+
+const AUDIO_BUFFER_SIZE = 8192 / 2
 
 const ERROR = {
-  NOT_STARTED : "NOT_STARTED",
-  INVALID_INDEX : "INVALID_INDEX"
+  NOT_STARTED: "NOT_STARTED",
+  INVALID_INDEX: "INVALID_INDEX"
 }
+
 
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
@@ -62,6 +66,7 @@ Sonus.init = (options, recognizer) => {
     sonus = new stream.Writable(),
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
+  sonus.ab = new BufferStream(AUDIO_BUFFER_SIZE)
   sonus.started = false
 
   // If we don't have any hotwords passed in, add the default global model
@@ -110,12 +115,13 @@ Sonus.init = (options, recognizer) => {
   })
 
   sonus.trigger = (index, hotword) => {
-    if(sonus.started){
-      try{
-        let triggerHotword = (index == 0)? hotword : models.lookup(index)
+    if (sonus.started) {
+      try {
+        let triggerHotword = (index == 0) ? hotword : models.lookup(index)
         sonus.emit('hotword', index, triggerHotword)
-        CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+        CloudSpeechRecognizer.startStreaming(opts, sonus.ab, csr)
       } catch (e) {
+        console.log(e)
         throw ERROR.INVALID_INDEX
       }
     } else {
@@ -133,6 +139,7 @@ Sonus.start = sonus => {
   })
 
   sonus.mic.pipe(sonus.detector)
+  sonus.mic.pipe(sonus.ab)
   sonus.started = true
 }
 
