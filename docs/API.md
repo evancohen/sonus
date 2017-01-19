@@ -42,11 +42,15 @@ Sonus's initialization accepts two paramaters:
  - **`hotwords`** - an array of recognizable hotwords
  - `lenguage` - streaming lenguage recognition
  - `dictionary` - [TODO] only supported by some streaming recognizers
+ - `recordProgram` - (default `'rec'`) Supports:
+   - `'rec'` - Good for OSX
+   - `'sox'` - Sometimes `rec` is aliased to this (not often)
+   - `'arecord'`- Reccomended for low powered linux devices (Pi, CHIP, etc)
 **`speechRecognizer`** - the speech recognizer of your choice
 
 **Example:**
 ``` javascript
-const sonus = Sonus.init({ hotwords, language }, speech)
+const sonus = Sonus.init({ hotwords, language, recordProgram: 'arecord' }, speech)
 ```
 
 ### Start recognition
