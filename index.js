@@ -9,8 +9,6 @@ const ERROR = {
   INVALID_INDEX: "INVALID_INDEX"
 }
 
-let verbose = false;
-
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
@@ -132,7 +130,7 @@ Sonus.init = (options, recognizer) => {
 Sonus.start = sonus => {
   sonus.mic = record.start({
     threshold: 0,
-    recordProgram: sonus.recordProgram || "sox",
+    recordProgram: sonus.recordProgram || "rec",
     verbose: false
   })
 

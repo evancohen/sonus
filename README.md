@@ -36,9 +36,9 @@ npm install --save sonus
 Generally, running `npm install` should suffice. This module however, requires you to install [SoX](http://sox.sourceforge.net).
 
 ### For most linux disto's
-**Reccomended:** use `arecord`, which comes with most linux distros.
+**Recommended:** use `arecord`, which comes with most linux distros.
 
-Alternativly:
+Alternatively:
 ```
 sudo apt-get install sox libsox-fmt-all
 ```
