@@ -5,9 +5,11 @@ const stream = require('stream')
 const {Detector, Models} = require('snowboy')
 
 const ERROR = {
-  NOT_STARTED : "NOT_STARTED",
-  INVALID_INDEX : "INVALID_INDEX"
+  NOT_STARTED: "NOT_STARTED",
+  INVALID_INDEX: "INVALID_INDEX"
 }
+
+let verbose = false;
 
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
@@ -62,6 +64,7 @@ Sonus.init = (options, recognizer) => {
     sonus = new stream.Writable(),
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
+  sonus.recordProgram = opts.recordProgram
   sonus.started = false
 
   // If we don't have any hotwords passed in, add the default global model
@@ -110,9 +113,9 @@ Sonus.init = (options, recognizer) => {
   })
 
   sonus.trigger = (index, hotword) => {
-    if(sonus.started){
-      try{
-        let triggerHotword = (index == 0)? hotword : models.lookup(index)
+    if (sonus.started) {
+      try {
+        let triggerHotword = (index == 0) ? hotword : models.lookup(index)
         sonus.emit('hotword', index, triggerHotword)
         CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
       } catch (e) {
@@ -129,6 +132,7 @@ Sonus.init = (options, recognizer) => {
 Sonus.start = sonus => {
   sonus.mic = record.start({
     threshold: 0,
+    recordProgram: sonus.recordProgram || "sox",
     verbose: false
   })
 
