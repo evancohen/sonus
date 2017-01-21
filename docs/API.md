@@ -29,18 +29,18 @@ const hotwords = [
 ```
 
 ### Languages
-Sonus lets you customize the lenguage for streaming speech recognition. For details on supported lenguages see the docs for your streaming speech recognizer
+Sonus lets you customize the language for streaming speech recognition. For details on supported languages see the docs for your streaming speech recognizer
 
 **Example:** (to be passed into the sonus constructor)  
 ``` javascript
-const lenguage = "en-US"
+const language = "en-US"
 ```
 
 ### Initialize Sonus
 Sonus's initialization accepts two paramaters:  
-**`options`** - an options object that contains your hotwords, lenguage, etc  
+**`options`** - an options object that contains your hotwords, language, etc  
  - **`hotwords`** - an array of recognizable hotwords
- - `lenguage` - streaming lenguage recognition
+ - `language` - streaming language recognition
  - `dictionary` - [TODO] only supported by some streaming recognizers
  - `recordProgram` - (default `'rec'`) Supports:
    - `'rec'` - Good for OSX
