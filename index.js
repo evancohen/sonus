@@ -29,7 +29,8 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     config: {
       encoding: 'LINEAR16',
       sampleRate: 16000,
-      languageCode: options.language
+      languageCode: options.language,
+      speechContext: options.speechContext || null
     },
     singleUtterance: true,
     interimResults: true,
@@ -130,6 +131,7 @@ Sonus.init = (options, recognizer) => {
 Sonus.start = sonus => {
   sonus.mic = record.start({
     threshold: 0,
+    device: sonus.device || null,
     recordProgram: sonus.recordProgram || "rec",
     verbose: false
   })
