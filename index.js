@@ -64,6 +64,7 @@ Sonus.init = (options, recognizer) => {
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
   sonus.recordProgram = opts.recordProgram
+  sonus.device = opts.device
   sonus.started = false
 
   // If we don't have any hotwords passed in, add the default global model
