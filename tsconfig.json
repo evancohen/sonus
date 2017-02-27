@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "target": "es2017",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noEmitOnError": true,
+        "outDir": "dist/",
+        "strictNullChecks": true,
+        "noImplicitThis": true,
+        "inlineSourceMap": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitAny": false
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "typings",
+        "examples"
+    ]
+}

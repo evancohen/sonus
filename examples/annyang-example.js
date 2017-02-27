@@ -1,7 +1,7 @@
 'use strict'
 
 const ROOT_DIR = __dirname + '/../'
-const Sonus = require(ROOT_DIR + 'index.js')
+const Sonus = require(ROOT_DIR + 'dist/src/sonus.js')
 const speech = require('@google-cloud/speech')({
   projectId: 'streaming-speech-sample',
   keyFilename: ROOT_DIR + 'keyfile.json'
@@ -23,9 +23,9 @@ const commands = {
   }
 }
 
-Sonus.annyang.addCommands(commands)
+sonus.annyang.addCommands(commands)
 
-Sonus.start(sonus)
+sonus.start();
 console.log('Say "' + hotwords[0].hotword + '"...')
 sonus.on('hotword', (index, keyword) => console.log("!" + keyword))
 sonus.on('partial-result', result => console.log("Partial", result))
@@ -33,6 +33,6 @@ sonus.on('partial-result', result => console.log("Partial", result))
 sonus.on('final-result', result => {
   console.log("Final", result)
   if (result.includes("stop")) {
-    Sonus.stop()
+    sonus.stop()
   }
 })

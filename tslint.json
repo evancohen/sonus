@@ -1,0 +1,23 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "quotemark": [
+            false
+        ],
+        "variable-name": [
+            "check-format",
+            "allow-leading-underscore"
+        ],
+        "object-literal-sort-keys": false,
+        "arrow-parens": false,
+        "trailing-comma": [
+            false
+        ],
+        "ordered-imports": [
+            false
+        ],
+        "member-ordering": [
+            false
+        ]
+    }
+}

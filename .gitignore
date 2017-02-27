@@ -1,3 +1,9 @@
+# Distribution directory
+dist/
+
+# Typescript typings files
+typings/
+
 # Logs
 logs
 *.log
