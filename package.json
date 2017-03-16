@@ -28,8 +28,7 @@
   "dependencies": {
     "@google-cloud/speech": "^0.6.0",
     "node-record-lpcm16": "^0.2.0",
-    "snowboy": "^1.1.0",
-    "stream": "0.0.2"
+    "snowboy": "^1.1.0"
   },
   "devDependencies": {
     "eslint": "^3.7.0"
