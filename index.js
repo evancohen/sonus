@@ -51,6 +51,10 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   })
 
   audioStream.pipe(recognitionStream)
+
+  recognitionStream.on('unpipe', () => {
+    recognitionStream.end()
+  })
 }
 
 const Sonus = {}
