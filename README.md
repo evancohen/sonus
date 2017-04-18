@@ -12,7 +12,7 @@
 
 Sonus is a speech to text library you can use to quickly and easally add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Now, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results.
 
-### Platform Support 
+### Platform Support
 - [X] Linux - most major distros (Including Raspbian)
 - [X] macOS
 - [ ] Windows
@@ -36,7 +36,7 @@ npm install --save sonus
 Generally, running `npm install` should suffice. This module however, requires you to install [SoX](http://sox.sourceforge.net).
 
 ### For most linux disto's
-Recommended: use `arecord`, which comes with most linux distros.  
+Recommended: use `arecord`, which comes with most linux distros.
 Alternatively:
 ```
 sudo apt-get install sox libsox-fmt-all
@@ -47,9 +47,12 @@ sudo apt-get install sox libsox-fmt-all
 brew install sox
 ```
 
-## Usage 
+## Usage
 
-Add sonus and your cloud speech recognition system of choice:
+Configure out cloud speech recognition system of choice, like [Google Cloud
+Speech API](https://cloud.google.com/speech/docs/getting-started).
+
+Add sonus and said recognizer:
 ``` javascript
 const Sonus = require('sonus')
 const speech = require('@google-cloud/speech')({
@@ -58,23 +61,37 @@ const speech = require('@google-cloud/speech')({
 })
 ```
 
-Add your keyword and initialize Sonus:
+Add your keyword and initialize Sonus with a [Snowboy](https://snowboy.kitt.ai)
+hotword:
 ``` javascript
-const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }] 
-const sonus = Sonus.init({ hotwords }, speech) 
+const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }]
+const sonus = Sonus.init({ hotwords }, speech)
 ```
 
 Create your own Alexa in less than a tweet:
 ``` javascript
-Sonus.start(sonus) 
-sonus.on('hotword', (index, keyword) => console.log("!")) 
-sonus.on('final-result', console.log) 
+Sonus.start(sonus)
+sonus.on('hotword', (index, keyword) => console.log("!"))
+sonus.on('final-result', console.log)
 ```
+
+## How do I set up Google Cloud Speech API?
+
+Follow [these instructions](https://cloud.google.com/speech/docs/getting-started).
+
+## How do I make my own hotword?
+
+Sonus uses [Snowboy](https://snowboy.kitt.ai) for offline hotword recognition.
+You can use [their website](https://snowboy.kitt.ai) or
+[API](http://docs.kitt.ai/snowboy/#restful-api) to train a model for a new
+hotword. Hotword training must occur online through their web service.
+
+
 ## Built [#withsonus](https://twitter.com/hashtag/withsonus?src=github)
 *If you build a project with Sonus send a PR and include it here!*
 
 ## Authors
-Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
+Evan Cohen: [@_evnc](https://twitter.com/_evnc)
 Ashish Chandwani: [@ashishschandwa1](https://twitter.com/ashishschandwa1)
 
 ## License
