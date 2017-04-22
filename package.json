@@ -2,9 +2,12 @@
   "name": "sonus",
   "version": "0.1.7",
   "description": "Open source cross platform decentralized always-on speech recognition framework",
-  "main": "index.js",
+  "main": "dist/src/sonus.js",
   "scripts": {
-    "test": "eslint ."
+    "test": "eslint . && tslint -c tslint.json src/**/*.ts",
+    "build": "tsc",
+    "example": "npm run build && node examples/example.js",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,9 @@
     "snowboy": "^1.1.0"
   },
   "devDependencies": {
-    "eslint": "^3.7.0"
+    "eslint": "^3.7.0",
+    "ts-node": "^2.1.0",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
   }
 }

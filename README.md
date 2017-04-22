@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./sonus.png" alt="sonus" />
+<img src="./resources/sonus.png" alt="sonus" />
 </p>
 <p align="center">
 <a href="https://travis-ci.org/evancohen/sonus"><img src="https://api.travis-ci.org/evancohen/sonus.svg?branch=master" alt="Build Status"/></a>
