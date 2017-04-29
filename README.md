@@ -88,6 +88,8 @@ hotword. Hotword training must occur online through their web service.
 
 
 ## Built [#withsonus](https://twitter.com/hashtag/withsonus?src=github)
+- [L.I.S.A. - Home automation project](https://github.com/mylisabox/lisa-box)
+
 *If you build a project with Sonus send a PR and include it here!*
 
 ## Authors
