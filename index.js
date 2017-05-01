@@ -28,9 +28,9 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   const recognitionStream = recognizer.createRecognizeStream({
     config: {
       encoding: 'LINEAR16',
-      sampleRate: 16000,
+      sampleRateHertz: 16000,
       languageCode: options.language,
-      speechContext: options.speechContext || null
+      speechContexts: options.speechContexts || null
     },
     singleUtterance: true,
     interimResults: true,
