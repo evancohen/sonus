@@ -43,7 +43,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   recognitionStream.on('data', data => {
     if (data) {
       cloudSpeechRecognizer.emit('data', data)
-      if (data.endpointerType === 'END_OF_UTTERANCE') {
+      if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE') {
         cloudSpeechRecognizer.listening = false
         audioStream.unpipe(recognitionStream)
       }
@@ -107,7 +107,7 @@ Sonus.init = (options, recognizer) => {
       } else {
         sonus.emit('partial-result', result.transcript)
       }
-    } else if (data.endpointerType === 'END_OF_UTTERANCE' && transcriptEmpty) {
+    } else if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE' && transcriptEmpty) {
       sonus.emit('final-result', "")
     }
   })
