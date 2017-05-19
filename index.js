@@ -109,6 +109,8 @@ Sonus.init = (options, recognizer) => {
       }
     } else if (data.endpointerType === 'END_OF_UTTERANCE' && transcriptEmpty) {
       sonus.emit('final-result', "")
+    } else if (data.error) {
+      sonus.emit('error', data.error)
     }
   })
 

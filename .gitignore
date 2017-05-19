@@ -41,3 +41,4 @@ jspm_packages
 
 # Keyfile
 keyfile.json
+/.idea/
