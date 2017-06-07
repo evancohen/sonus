@@ -46,6 +46,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE') {
         cloudSpeechRecognizer.listening = false
         audioStream.unpipe(recognitionStream)
+        recognitionStream.end()
       }
     }
   })

@@ -20,6 +20,8 @@ sonus.on('hotword', (index, keyword) => console.log("!" + keyword))
 
 sonus.on('partial-result', result => console.log("Partial", result))
 
+sonus.on('error', error => console.log('error', error))
+
 sonus.on('final-result', result => {
   console.log("Final", result)
   if (result.includes("stop")) {
