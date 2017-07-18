@@ -1,6 +1,11 @@
+dist: trusty
 language: node_js
 node_js:
   - "--lts"
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y sox libatlas-base-dev
 
 cache:
   directories:
