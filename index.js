@@ -25,7 +25,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   cloudSpeechRecognizer.listening = true
 
   const recognizer = cloudSpeechRecognizer.recognizer
-  const recognitionStream = recognizer.createRecognizeStream({
+  const recognitionStream = recognizer.streamingRecognize({
     config: {
       encoding: 'LINEAR16',
       sampleRateHertz: 16000,
@@ -34,7 +34,6 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     },
     singleUtterance: true,
     interimResults: true,
-    verbose: true
   })
 
   recognitionStream.on('error', err => cloudSpeechRecognizer.emit('error', err))
@@ -102,11 +101,11 @@ Sonus.init = (options, recognizer) => {
     if (result) {
       transcriptEmpty = false
       if (result.isFinal) {
-        sonus.emit('final-result', result.transcript)
-        Sonus.annyang.trigger(result.transcript)
+        sonus.emit('final-result', result.alternatives[0].transcript)
+        Sonus.annyang.trigger(result.alternatives[0].transcript)
         transcriptEmpty = true //reset transcript
-      } else {
-        sonus.emit('partial-result', result.transcript)
+      } else if(result.alternatives) {
+        sonus.emit('partial-result', result.alternatives[0].transcript)
       }
     } else if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE' && transcriptEmpty) {
       sonus.emit('final-result', "")
@@ -129,6 +128,14 @@ Sonus.init = (options, recognizer) => {
     }
   }
 
+  sonus.pause = () => {
+    record.pause()
+  }
+
+  sonus.resume = () => {
+    record.resume()
+  }
+
   return sonus
 }
 
@@ -146,9 +153,9 @@ Sonus.start = sonus => {
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
-Sonus.pause = sonus => sonus.mic.pause()
+Sonus.pause = () => record.pause()
 
-Sonus.resume = sonus => sonus.mic.resume()
+Sonus.resume = () => record.resume()
 
 Sonus.stop = () => record.stop()
 
