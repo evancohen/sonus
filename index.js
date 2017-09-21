@@ -36,7 +36,10 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     interimResults: true,
   })
 
-  recognitionStream.on('error', err => cloudSpeechRecognizer.emit('error', err))
+  recognitionStream.on('error', err => {
+    cloudSpeechRecognizer.emit('error', err)
+    cloudSpeechRecognizer.listening = false
+  })
 
 
   recognitionStream.on('data', data => {
