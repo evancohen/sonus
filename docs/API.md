@@ -112,7 +112,8 @@ Passing a hotword with a valid index will override the hotword name and trigger 
 sonus.trigger(sonus, 1, 'override')
 ```
 ## Events
-hotword
-partial-result
-final-result
-error
+`hotword` - a hotword was detected
+`partial-result` - partial result for detected speech
+`final-result` - final result for detected speech
+`timeout` - request timed out with no detected speech
+`error` - an error occured during detection
