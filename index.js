@@ -58,7 +58,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       } else {
         // Reached transcription time limit
         if(!hasResults){
-          cloudSpeechRecognizer.emit('timeout')
+          cloudSpeechRecognizer.emit('final-result', '')
         }
         stopStream()
       }
@@ -116,7 +116,6 @@ Sonus.init = (options, recognizer) => {
   // Handel speech recognition requests
   csr.on('error', error => sonus.emit('error', { streamingError: error }))
   csr.on('partial-result', transcript => sonus.emit('partial-result', transcript))
-  csr.on('timeout', () => sonus.emit('timeout'))
   csr.on('final-result', transcript => {
     sonus.emit('final-result', transcript)
     Sonus.annyang.trigger(transcript)
