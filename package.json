@@ -1,6 +1,6 @@
 {
   "name": "sonus",
-  "version": "0.1.9-3",
+  "version": "0.1.9-4",
   "description": "Open source cross platform decentralized always-on speech recognition framework",
   "main": "index.js",
   "scripts": {
