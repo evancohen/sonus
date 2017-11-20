@@ -2,7 +2,7 @@
 
 const record = require('node-record-lpcm16')
 const stream = require('stream')
-const {Detector, Models} = require('snowboy')
+const { Detector, Models } = require('snowboy')
 
 const ERROR = {
   NOT_STARTED: "NOT_STARTED",
@@ -22,10 +22,10 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     return
   }
 
+  let hasResults = false
   cloudSpeechRecognizer.listening = true
 
-  const recognizer = cloudSpeechRecognizer.recognizer
-  const recognitionStream = recognizer.createRecognizeStream({
+  const request = {
     config: {
       encoding: 'LINEAR16',
       sampleRateHertz: 16000,
@@ -34,22 +34,41 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     },
     singleUtterance: true,
     interimResults: true,
-    verbose: true
-  })
+  }
 
-  recognitionStream.on('error', err => cloudSpeechRecognizer.emit('error', err))
-
-
-  recognitionStream.on('data', data => {
-    if (data) {
-      cloudSpeechRecognizer.emit('data', data)
-      if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE') {
-        cloudSpeechRecognizer.listening = false
-        audioStream.unpipe(recognitionStream)
-        recognitionStream.end()
+  const recognitionStream = cloudSpeechRecognizer.recognizer
+    .streamingRecognize(request)
+    .on('error', err => {
+      cloudSpeechRecognizer.emit('error', err)
+      stopStream()
+    })
+    .on('data', data => {
+      if (data.results[0] && data.results[0].alternatives[0]) {
+        hasResults = true;
+        // Emit partial or final results and end the stream
+        if (data.error) {
+          cloudSpeechRecognizer.emit('error', data.error)
+          stopStream()
+        } else if (data.results[0].isFinal) {
+          cloudSpeechRecognizer.emit('final-result', data.results[0].alternatives[0].transcript)
+          stopStream()
+        } else {
+          cloudSpeechRecognizer.emit('partial-result', data.results[0].alternatives[0].transcript)
+        }
+      } else {
+        // Reached transcription time limit
+        if(!hasResults){
+          cloudSpeechRecognizer.emit('final-result', '')
+        }
+        stopStream()
       }
-    }
-  })
+    })
+
+  const stopStream = () => {
+    cloudSpeechRecognizer.listening = false
+    audioStream.unpipe(recognitionStream)
+    recognitionStream.end()
+  }
 
   audioStream.pipe(recognitionStream)
 }
@@ -94,25 +113,12 @@ Sonus.init = (options, recognizer) => {
     sonus.trigger(index, hotword)
   })
 
+  // Handel speech recognition requests
   csr.on('error', error => sonus.emit('error', { streamingError: error }))
-
-  let transcriptEmpty = true
-  csr.on('data', data => {
-    const result = data.results[0]
-    if (result) {
-      transcriptEmpty = false
-      if (result.isFinal) {
-        sonus.emit('final-result', result.transcript)
-        Sonus.annyang.trigger(result.transcript)
-        transcriptEmpty = true //reset transcript
-      } else {
-        sonus.emit('partial-result', result.transcript)
-      }
-    } else if (data.speechEventType === 'END_OF_SINGLE_UTTERANCE' && transcriptEmpty) {
-      sonus.emit('final-result', "")
-    } else if (data.error) {
-      sonus.emit('error', data.error)
-    }
+  csr.on('partial-result', transcript => sonus.emit('partial-result', transcript))
+  csr.on('final-result', transcript => {
+    sonus.emit('final-result', transcript)
+    Sonus.annyang.trigger(transcript)
   })
 
   sonus.trigger = (index, hotword) => {
@@ -127,6 +133,14 @@ Sonus.init = (options, recognizer) => {
     } else {
       throw ERROR.NOT_STARTED
     }
+  }
+
+  sonus.pause = () => {
+    record.pause()
+  }
+
+  sonus.resume = () => {
+    record.resume()
   }
 
   return sonus
@@ -146,9 +160,9 @@ Sonus.start = sonus => {
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
-Sonus.pause = sonus => sonus.mic.pause()
+Sonus.pause = () => record.pause()
 
-Sonus.resume = sonus => sonus.mic.resume()
+Sonus.resume = () => record.resume()
 
 Sonus.stop = () => record.stop()
 

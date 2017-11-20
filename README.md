@@ -7,10 +7,10 @@
 <a href='https://dependencyci.com/github/evancohen/sonus'><img src='https://dependencyci.com/github/evancohen/sonus/badge' alt='Dependency Status'/></a>
 </p>
 <p align="center">
-<strong>This project is in active development and is rapidly evolving.  As of <code>v0.1.0</code> it uses semantic versioning.</strong>
+<strong>A dead simple STT library in Node</strong>
 </p>
 
-Sonus is a speech to text library you can use to quickly and easally add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Now, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results.
+Sonus lets you quickly and easally add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Now, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results.
 
 ### Platform Support
 - [X] Linux - most major distros (Including Raspbian)
@@ -75,6 +75,12 @@ sonus.on('hotword', (index, keyword) => console.log("!"))
 sonus.on('final-result', console.log)
 ```
 
+### [Full API Documentation](docs/API.md)
+
+## Versioning
+
+This project uses semantic versioning as of `v0.1.0`
+
 ## How do I set up Google Cloud Speech API?
 
 Follow [these instructions](https://cloud.google.com/speech/docs/getting-started).
@@ -90,10 +96,10 @@ hotword. Hotword training must occur online through their web service.
 ## Built [#withsonus](https://twitter.com/hashtag/withsonus?src=github)
 - [L.I.S.A. - Home automation project](https://github.com/mylisabox/lisa-box)
 
-*If you build a project with Sonus send a PR and include it here!*
+*If you've build a project with Sonus send a PR and include it here!*
 
 ## Authors
-Evan Cohen: [@_evnc](https://twitter.com/_evnc)
+Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
 Ashish Chandwani: [@ashishschandwa1](https://twitter.com/ashishschandwa1)
 
 ## License
