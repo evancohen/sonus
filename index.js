@@ -106,7 +106,7 @@ Sonus.init = (options, recognizer) => {
   const detector = sonus.detector = new Detector(opts)
 
   detector.on('silence', () => sonus.emit('silence'))
-  detector.on('sound', () => sonus.emit('sound'))
+  detector.on('sound', (data) => sonus.emit('sound',data.length))
 
   // When a hotword is detected pipe the audio stream to speech detection
   detector.on('hotword', (index, hotword) => {
