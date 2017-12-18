@@ -153,6 +153,11 @@ Sonus.start = sonus => {
     recordProgram: sonus.recordProgram || "rec",
     verbose: false
   })
+	
+	// capture any process error on stdout, when record.stop issued
+	sonus.mic.on('error', function(data){
+		// rec.emit('error', data.toString())
+	})
 
   sonus.mic.pipe(sonus.detector)
   sonus.started = true
