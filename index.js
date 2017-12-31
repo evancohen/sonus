@@ -8,7 +8,7 @@ const ERROR = {
   NOT_STARTED: "NOT_STARTED",
   INVALID_INDEX: "INVALID_INDEX"
 }
-
+var recording=false;
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
@@ -118,7 +118,8 @@ Sonus.init = (options, recognizer) => {
   csr.on('partial-result', transcript => sonus.emit('partial-result', transcript))
   csr.on('final-result', transcript => {
     sonus.emit('final-result', transcript)
-    Sonus.annyang.trigger(transcript)
+		if(transcript.length>0)
+			Sonus.annyang.trigger(transcript)
   })
 
   sonus.trigger = (index, hotword) => {
@@ -156,19 +157,29 @@ Sonus.start = sonus => {
 	
 	// capture any process error on stdout, when record.stop issued
 	sonus.mic.on('error', function(data){
-		// rec.emit('error', data.toString())
+		if(recording)
+			sonus.emit('error', "data.toString())
+	})
+	sonus.mic.on('end', function(data){
+		if(recording)
+			sonus.emit('end', data.toString())
+	})
+	sonus.mic.on('close', function(data){
+		if(recording)
+			sonus.emit('close',data.toString())
 	})
 
   sonus.mic.pipe(sonus.detector)
+  recording=true;
   sonus.started = true
 }
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
-Sonus.pause = () => record.pause()
+Sonus.pause = () => {record.pause(); recording=false;}
 
-Sonus.resume = () => record.resume()
+Sonus.resume = () => {record.resume(); recording=true;}
 
-Sonus.stop = () => record.stop()
+Sonus.stop = () => {record.stop();recording=false}
 
 module.exports = Sonus
