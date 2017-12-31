@@ -158,7 +158,7 @@ Sonus.start = sonus => {
 	// capture any process error on stdout, when record.stop issued
 	sonus.mic.on('error', function(data){
 		if(recording)
-			sonus.emit('error', "data.toString())
+			sonus.emit('error', data.toString())
 	})
 	sonus.mic.on('end', function(data){
 		if(recording)
