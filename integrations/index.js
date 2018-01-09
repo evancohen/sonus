@@ -12,8 +12,21 @@ integrations.map(name => {
 })
 
 /* can be used like
-const googleSpeech = require('sonus/integrations').google
-  or
-const { watson } = require('sonus/integrations')
+
+const googleSpeech = require('@google-cloud/speech')({
+  projectId: 'streaming-speech-sample',
+  keyFilename: './keyfile.json'
+})
+
+const speech = require('sonus/integrations').google(googleSpeech)
+
+OR
+
+var watsonSpeech = new require('watson-developer-cloud/speech-to-text/v1')({
+  username: '<username>',
+  password: '<password>'
+});
+
+const speech = require('sonus/integrations').watson(watsonSpeech)
 
 */
