@@ -20,6 +20,7 @@ Sonus lets you quickly and easily add a VUI (Voice User Interface) to any hardwa
 ### Streaming Recognition Services
 
 - [X] Google Cloud Speech
+- [X] IBM Watson
 - [ ] Alexa Voice Services
 - [ ] Wit.ai
 - [ ] Microsoft Cognitive Services
@@ -99,7 +100,7 @@ hotword. Hotword training must occur online through their web service.
 *If you've build a project with Sonus send a PR and include it here!*
 
 ## Authors
-Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
+Evan Cohen: [@_evnc](https://twitter.com/_evnc)
 Ashish Chandwani: [@ashishschandwa1](https://twitter.com/ashishschandwa1)
 
 ## License

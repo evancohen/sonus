@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/evancohen/sonus#readme",
   "dependencies": {
-    "@google-cloud/speech": "^0.10.3",
     "node-record-lpcm16": "^0.3.0",
     "snowboy": "^1.2.0"
   },
