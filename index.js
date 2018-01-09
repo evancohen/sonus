@@ -14,6 +14,12 @@ CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
   csr.listening = false
   csr.recognizer = recognizer
+
+  // bind integration hooks
+  if (recognizer.finalEvent) csr.on('final-result', recognizer.finalEvent)
+  if (recognizer.partitalEvent) csr.on('partial-result', recognizer.partitalEvent)
+  if (recognizer.errorEvent) csr.on('error', recognizer.errorEvent)
+
   return csr
 }
 
@@ -25,6 +31,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   let hasResults = false
   cloudSpeechRecognizer.listening = true
 
+  // ToDo: remove this in favor of cross-platform config
   const request = {
     config: {
       encoding: 'LINEAR16',
@@ -36,6 +43,12 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     interimResults: true,
   }
 
+  let silent = false;
+  cloudSpeechRecognizer.on('silence', () => (silent = true))
+  cloudSpeechRecognizer.on('sound', () => {
+	  if (silent) silent = false
+  });
+
   const recognitionStream = cloudSpeechRecognizer.recognizer
     .streamingRecognize(request)
     .on('error', err => {
@@ -43,9 +56,10 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       stopStream()
     })
     .on('data', data => {
+		console.log(data)
       if (data.results[0] && data.results[0].alternatives[0]) {
         hasResults = true;
-        // Emit partial or final results and end the stream
+        // Emit partial or final rcsresults and end the stream
         if (data.error) {
           cloudSpeechRecognizer.emit('error', data.error)
           stopStream()
@@ -64,13 +78,28 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       }
     })
 
+  let silenceCount = 0
+
+  const socketEvent = data => {
+    if (silent) silenceCount++
+
+    if (silenceCount > 4){
+        stopStream()
+		silenceCount = 0
+    } else recognitionStream.write(data)
+  }
+
   const stopStream = () => {
     cloudSpeechRecognizer.listening = false
-    audioStream.unpipe(recognitionStream)
+
+    if (cloudSpeechRecognizer.recognizer.isSocket) audioStream.removeListener('data', socketEvent)
+	else audioStream.unpipe(recognitionStream)
+
     recognitionStream.end()
   }
 
-  audioStream.pipe(recognitionStream)
+  if (cloudSpeechRecognizer.recognizer.isSocket) audioStream.on('data', socketEvent)
+  else audioStream.pipe(recognitionStream)
 }
 
 const Sonus = {}
@@ -105,8 +134,14 @@ Sonus.init = (options, recognizer) => {
 
   const detector = sonus.detector = new Detector(opts)
 
-  detector.on('silence', () => sonus.emit('silence'))
-  detector.on('sound', () => sonus.emit('sound'))
+  detector.on('silence', () => {
+    csr.emit('silence')
+    sonus.emit('silence')
+  })
+  detector.on('sound', () => {
+    csr.emit('sound')
+    sonus.emit('sound')
+  })
 
   // When a hotword is detected pipe the audio stream to speech detection
   detector.on('hotword', (index, hotword) => {
