@@ -6,9 +6,9 @@ let integration
 
 // loop through integrations
 integrations.map(name => {
-	try { integration = require('./' + name) } catch (e) {}
-	if (integration) module.exports[name] = integration
-	else console.warn('missing integration for', name)
+    try { integration = require('./' + name) } catch (e) {}
+    if (integration) module.exports[name] = integration
+    else console.warn('missing integration for', name)
 })
 
 /* can be used like
