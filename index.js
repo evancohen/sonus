@@ -46,7 +46,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   let silent = false;
   cloudSpeechRecognizer.on('silence', () => (silent = true))
   cloudSpeechRecognizer.on('sound', () => {
-	  if (silent) silent = false
+    if (silent) silent = false
   });
 
   const recognitionStream = cloudSpeechRecognizer.recognizer
@@ -56,18 +56,19 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       stopStream()
     })
     .on('data', data => {
-		console.log(data)
-      if (data.results[0] && data.results[0].alternatives[0]) {
+      const firstResult = (data.results) ? data.results[0] : null;
+      if (firstResult && firstResult.alternatives[0]) {
         hasResults = true;
+		cloudSpeechRecognizer.emit('raw', data)
         // Emit partial or final rcsresults and end the stream
         if (data.error) {
           cloudSpeechRecognizer.emit('error', data.error)
           stopStream()
-        } else if (data.results[0].isFinal) {
-          cloudSpeechRecognizer.emit('final-result', data.results[0].alternatives[0].transcript)
+        } else if (firstResult.isFinal || firstResult.final) {
+          cloudSpeechRecognizer.emit('final-result', firstResult.alternatives[0].transcript)
           stopStream()
         } else {
-          cloudSpeechRecognizer.emit('partial-result', data.results[0].alternatives[0].transcript)
+          cloudSpeechRecognizer.emit('partial-result', firstResult.alternatives[0].transcript)
         }
       } else {
         // Reached transcription time limit
@@ -84,8 +85,8 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     if (silent) silenceCount++
 
     if (silenceCount > 4){
-        stopStream()
-		silenceCount = 0
+      stopStream()
+      silenceCount = 0
     } else recognitionStream.write(data)
   }
 
@@ -93,7 +94,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     cloudSpeechRecognizer.listening = false
 
     if (cloudSpeechRecognizer.recognizer.isSocket) audioStream.removeListener('data', socketEvent)
-	else audioStream.unpipe(recognitionStream)
+    else audioStream.unpipe(recognitionStream)
 
     recognitionStream.end()
   }
@@ -155,6 +156,7 @@ Sonus.init = (options, recognizer) => {
     sonus.emit('final-result', transcript)
     Sonus.annyang.trigger(transcript)
   })
+  csr.on('raw', rawData => sonus.emit('raw', rawData))
 
   sonus.trigger = (index, hotword) => {
     if (sonus.started) {
