@@ -62,6 +62,18 @@ const speech = require('@google-cloud/speech')({
 })
 ```
 
+If using a custom speech system, be sure to use an integration:
+```javascript
+const watsonClass = require('watson-developer-cloud/speech-to-text/v1');
+const watsonSpeech = new watsonClass({
+  "url": "https://stream.watsonplatform.net/speech-to-text/api",
+  "username": "<username>",
+  "password": "<password>"
+})
+
+const speech = require('sonus/integrations').watson(watsonSpeech)
+```
+
 Add your keyword and initialize Sonus with a [Snowboy](https://snowboy.kitt.ai)
 hotword:
 ``` javascript
@@ -74,6 +86,7 @@ Create your own Alexa in less than a tweet:
 Sonus.start(sonus)
 sonus.on('hotword', (index, keyword) => console.log("!"))
 sonus.on('final-result', console.log)
+sonus.on('raw', console.log)
 ```
 
 ### [Full API Documentation](docs/API.md)
