@@ -9,6 +9,8 @@ const ERROR = {
   INVALID_INDEX: "INVALID_INDEX"
 }
 
+const SILENCE_TIMEOUT = 6 // timeout in samples for sockets
+
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
@@ -43,11 +45,14 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
     interimResults: true,
   }
 
-  let silent = false;
-  cloudSpeechRecognizer.on('silence', () => (silent = true))
-  cloudSpeechRecognizer.on('sound', () => {
+  const onSilence = () => (silent = true)
+  const onSound = () => {
     if (silent) silent = false
-  });
+  }
+
+  let silent = false
+  cloudSpeechRecognizer.on('silence', onSilence)
+  cloudSpeechRecognizer.on('sound', onSound)
 
   const recognitionStream = cloudSpeechRecognizer.recognizer
     .streamingRecognize(request)
@@ -56,10 +61,10 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
       stopStream()
     })
     .on('data', data => {
-      const firstResult = (data.results) ? data.results[0] : null;
+      const firstResult = (data.results) ? data.results[0] : null
       if (firstResult && firstResult.alternatives[0]) {
-        hasResults = true;
-		cloudSpeechRecognizer.emit('raw', data)
+        hasResults = true
+        cloudSpeechRecognizer.emit('raw', data)
         // Emit partial or final rcsresults and end the stream
         if (data.error) {
           cloudSpeechRecognizer.emit('error', data.error)
@@ -84,7 +89,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
   const socketEvent = data => {
     if (silent) silenceCount++
 
-    if (silenceCount > 4){
+    if (silenceCount > SILENCE_TIMEOUT){
       stopStream()
       silenceCount = 0
     } else recognitionStream.write(data)
@@ -95,6 +100,9 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
 
     if (cloudSpeechRecognizer.recognizer.isSocket) audioStream.removeListener('data', socketEvent)
     else audioStream.unpipe(recognitionStream)
+
+    cloudSpeechRecognizer.removeListener('silence', onSilence)
+    cloudSpeechRecognizer.removeListener('sound', onSound)
 
     recognitionStream.end()
   }
