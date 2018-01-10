@@ -6,7 +6,9 @@ let integration
 
 // loop through integrations
 integrations.map(name => {
-    try { integration = require('./' + name) } catch (e) {}
+    try { integration = require('./' + name) } catch (e) {
+      console.warn('require error', name)
+    }
     if (integration) module.exports[name] = integration
     else console.warn('missing integration for', name)
 })
