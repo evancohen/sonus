@@ -3,8 +3,8 @@
 const ROOT_DIR = __dirname + '/../'
 const Sonus = require(ROOT_DIR + 'index.js')
 
-const watsonClass = require('watson-developer-cloud/speech-to-text/v1');
-const watsonSpeech = new watsonClass({
+const WatsonClass = require('watson-developer-cloud/speech-to-text/v1');
+const watsonSpeech = new WatsonClass({
   "url": "https://stream.watsonplatform.net/speech-to-text/api",
   "username": "<username>",
   "password": "<password>"
