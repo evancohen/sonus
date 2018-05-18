@@ -41,7 +41,7 @@ Sonus's initialization accepts two paramaters:
 **`options`** - an options object that contains your hotwords, language, etc  
  - **`hotwords`** - an array of recognizable hotwords
  - `language` - streaming language recognition
- - `speechContext` - Array of strings containing words/phrases so that the speech recognizer is more likely to recognize them.
+ - `speechContexts` - Array of strings containing words/phrases so that the speech recognizer is more likely to recognize them.
  - `recordProgram` - (default `'rec'`) Supports:
    - `'rec'` - Good for OSX
    - `'sox'` - Sometimes `rec` is aliased to this (not often)
