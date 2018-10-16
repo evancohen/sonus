@@ -2,14 +2,15 @@
 
 const ROOT_DIR = __dirname + '/../'
 const Sonus = require(ROOT_DIR + 'index.js')
-const speech = require('@google-cloud/speech')({
+const speech = require('@google-cloud/speech')
+const client = new speech.SpeechClient({
   projectId: 'streaming-speech-sample',
-  keyFilename: ROOT_DIR + 'keyfile.json'
+  keyFilename: ROOT_DIR +  'keyfile.json'
 })
 
 const hotwords = [{ file: ROOT_DIR + 'resources/sonus.pmdl', hotword: 'sonus' }]
 const language = "en-US"
-const sonus = Sonus.init({ hotwords, language }, speech)
+const sonus = Sonus.init({ hotwords, language }, client)
 
 try{
   Sonus.trigger(sonus, 1)
