@@ -9,7 +9,7 @@ const speech = require('@google-cloud/speech')({
 
 const hotwords = [{ file: ROOT_DIR + 'resources/sonus.pmdl', hotword: 'sonus' }]
 const language = "en-US"
-const sonus = Sonus.init({ hotwords, language }, speech)
+const sonus = Sonus.init({ hotwords, language: language }, speech)
 
 try{
   Sonus.trigger(sonus, 1)
