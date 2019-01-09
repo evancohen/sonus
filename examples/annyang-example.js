@@ -10,7 +10,7 @@ const client = new speech.SpeechClient({
 
 const hotwords = [{ file: ROOT_DIR + 'resources/sonus.pmdl', hotword: 'sonus' }]
 const language = "en-US"
-const sonus = Sonus.init({ hotwords, language }, client)
+const sonus = Sonus.init({ hotwords, language: language }, client)
 
 const commands = {
   'hello': function () {
