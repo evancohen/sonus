@@ -5,9 +5,10 @@ Paramaters marked in **bold** are required
 ### Require sonus and a cloud speech recognizer in your project:
 ``` javascript
 const Sonus = require('sonus')
-const speech = require('@google-cloud/speech')({
+const speech = require('@google-cloud/speech')
+const client = new speech.SpeechClient({
   projectId: 'streaming-speech-sample',
-  keyFilename: './keyfile.json'
+  keyFilename: ROOT_DIR +  'keyfile.json'
 })
 ```
 For more information about Google Cloud Speech see: https://cloud.google.com/speech/
