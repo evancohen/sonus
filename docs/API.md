@@ -5,9 +5,10 @@ Paramaters marked in **bold** are required
 ### Require sonus and a cloud speech recognizer in your project:
 ``` javascript
 const Sonus = require('sonus')
-const speech = require('@google-cloud/speech')({
+const speech = require('@google-cloud/speech')
+const client = new speech.SpeechClient({
   projectId: 'streaming-speech-sample',
-  keyFilename: './keyfile.json'
+  keyFilename: ROOT_DIR +  'keyfile.json'
 })
 ```
 For more information about Google Cloud Speech see: https://cloud.google.com/speech/
@@ -41,7 +42,7 @@ Sonus's initialization accepts two paramaters:
 **`options`** - an options object that contains your hotwords, language, etc  
  - **`hotwords`** - an array of recognizable hotwords
  - `language` - streaming language recognition
- - `speechContext` - Array of strings containing words/phrases so that the speech recognizer is more likely to recognize them.
+ - `speechContexts` - Array of strings containing words/phrases so that the speech recognizer is more likely to recognize them.
  - `recordProgram` - (default `'rec'`) Supports:
    - `'rec'` - Good for OSX
    - `'sox'` - Sometimes `rec` is aliased to this (not often)

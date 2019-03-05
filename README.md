@@ -10,7 +10,7 @@
 <strong>A dead simple STT library in Node</strong>
 </p>
 
-Sonus lets you quickly and easally add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Now, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results.
+Sonus lets you quickly and easily add a VUI (Voice User Interface) to any hardware or software project. Just like Alexa, Google Assistant, and Siri, Sonus is always listening offline for a *customizable* hotword. Once that hotword is detected your speech is streamed to the cloud recognition service of your choice - then you get the results in realtime.
 
 ### Platform Support
 - [X] Linux - most major distros (Including Raspbian)
@@ -52,20 +52,20 @@ brew install sox
 Configure out cloud speech recognition system of choice, like [Google Cloud
 Speech API](https://cloud.google.com/speech/docs/getting-started).
 
+__Note:__ You need to use the `GOOGLE_APPLICATION_CREDENTIALS` environment variable for your JSON keyfile, or check the examples to see how you can pass in the keyflie path. 
+
 Add sonus and said recognizer:
 ``` javascript
 const Sonus = require('sonus')
-const speech = require('@google-cloud/speech')({
-  projectId: 'streaming-speech-sample',
-  keyFilename: './keyfile.json'
-})
+const speech = require('@google-cloud/speech')
+const client = new speech.SpeechClient()
 ```
 
 Add your keyword and initialize Sonus with a [Snowboy](https://snowboy.kitt.ai)
 hotword:
 ``` javascript
 const hotwords = [{ file: 'resources/snowboy.umdl', hotword: 'snowboy' }]
-const sonus = Sonus.init({ hotwords }, speech)
+const sonus = Sonus.init({ hotwords }, client)
 ```
 
 Create your own Alexa in less than a tweet:
