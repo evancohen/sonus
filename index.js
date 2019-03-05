@@ -3,7 +3,9 @@
 const record = require('node-record-lpcm16')
 const stream = require('stream')
 const { Detector, Models } = require('snowboy')
-
+const consecutiveEmptyBuffers = 20;
+var emptybufferCounter=0;
+var timer=null
 const ERROR = {
   NOT_STARTED: "NOT_STARTED",
   INVALID_INDEX: "INVALID_INDEX"
@@ -74,6 +76,7 @@ CloudSpeechRecognizer.startStreaming = (options, audioStream, cloudSpeechRecogni
 }
 
 const Sonus = {}
+var detector = null;
 Sonus.annyang = require('./lib/annyang-core.js')
 
 Sonus.init = (options, recognizer) => {
@@ -103,22 +106,16 @@ Sonus.init = (options, recognizer) => {
   opts.audioGain = opts.audioGain || 2.0
   opts.language = opts.language || 'en-US' //https://cloud.google.com/speech/docs/languages
 
-  const detector = sonus.detector = new Detector(opts)
+  sonus.opts=opts
+  Sonus.setupDetector(sonus)
 
-  detector.on('silence', () => sonus.emit('silence'))
-  detector.on('sound', () => sonus.emit('sound'))
-
-  // When a hotword is detected pipe the audio stream to speech detection
-  detector.on('hotword', (index, hotword) => {
-    sonus.trigger(index, hotword)
-  })
-
-  // Handel speech recognition requests
+  // Handle speech recognition requests
   csr.on('error', error => sonus.emit('error', { streamingError: error }))
   csr.on('partial-result', transcript => sonus.emit('partial-result', transcript))
   csr.on('final-result', transcript => {
     sonus.emit('final-result', transcript)
-    Sonus.annyang.trigger(transcript)
+    if(transcript.length>0)
+      Sonus.annyang.trigger(transcript)
   })
 
   sonus.trigger = (index, hotword) => {
@@ -146,14 +143,81 @@ Sonus.init = (options, recognizer) => {
   return sonus
 }
 
+Sonus.setupDetector = (sonus) => {
+  
+  detector = sonus.detector = new Detector(sonus.opts)
+
+  detector.on('silence', () => {emptybufferCounter=0; sonus.emit('silence')})
+  detector.on('sound', (data) => {
+    // only process sound events if we are not in recovery mode, otherwise we get a random segment fault
+		if(timer==null){
+			// the arecord process has a bug, where it will start sending empty wav 'files' over and over.
+			// the only recovery is to kill that process, and start a new one
+			// so we are looking for a set of consecutive empty 
+			//	(or very small data, testing shows 8, 12, and 44 byte buffers) 
+			//  pcm data buffers as the indicator that arecord is stuck
+      //  normal buffer size if 4096 bytes in 16000 hz recording mode
+			//  if there is no sound data, only header, count it
+			if((data.length<100) && (++emptybufferCounter)){
+				// if we have consecutive no data packets, then arecord is stuck
+				if(emptybufferCounter>consecutiveEmptyBuffers){
+					// stop reco, this will force kill the pcm application
+					record.stop()
+					// and clear the consecutive buffer counter
+					emptybufferCounter=0;
+					// setup the restart timer, as we are on a callback now
+					timer=setTimeout(function(){ Sonus.restart(sonus)}, 100);
+				}	
+			} else{
+				// have data
+				// reset the consecutive empty counter 
+				emptybufferCounter=0;
+        sonus.emit('sound', data)
+			}
+		}
+  })
+  // if the reco engine closes on its own
+	detector.on('close', close_msg => {
+		// if we are not already in recovery mode
+		if(timer==null){
+			console.error("!e:", close_msg)
+			// the process has ended 
+			// set value to prevent recursion
+			timer=1
+			// stop the reco processing, clean up
+			record.stop()
+			emptybufferCounter=0;
+			// setup to restart reco
+			timer=setTimeout(function() {Sonus.restart(sonus)}, 200);	
+		}
+	})
+	detector.on('end', end_msg => {
+		// place holder for end notification
+		console.error("!e:", end_msg)
+	})
+  // When a hotword is detected pipe the audio stream to speech detection
+  detector.on('hotword', (index, hotword) => {
+    sonus.trigger(index, hotword)
+  })
+
+}
+//  used to enable restarting the pcm recorder and detector
+Sonus.restart = source => {  
+  timer = null;
+  // detector has to be replaced on restart
+  Sonus.setupDetector(source.opts)  
+  Sonus.start(source)
+}
+
 Sonus.start = sonus => {
+  // start the pcm data recorder
   sonus.mic = record.start({
     threshold: 0,
     device: sonus.device || null,
     recordProgram: sonus.recordProgram || "rec",
     verbose: false
   })
-
+  // pipe the data to the detector
   sonus.mic.pipe(sonus.detector)
   sonus.started = true
 }
