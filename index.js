@@ -9,6 +9,8 @@ const ERROR = {
   INVALID_INDEX: "INVALID_INDEX"
 }
 
+const ARECORD_FILE_LIMIT = 1500000000 // 1.5 GB
+
 const CloudSpeechRecognizer = {}
 CloudSpeechRecognizer.init = recognizer => {
   const csr = new stream.Writable()
@@ -147,15 +149,50 @@ Sonus.init = (options, recognizer) => {
 }
 
 Sonus.start = sonus => {
-  sonus.mic = record.start({
+  sonus.mic = Recorder(sonus)
+
+  if(sonus.recordProgram === "arecord"){
+    ArecordHelper.init(sonus)
+  }
+
+  sonus.mic.pipe(sonus.detector)
+  sonus.started = true
+}
+
+const Recorder = (sonus) => {
+  return record.start({
     threshold: 0,
     device: sonus.device || null,
     recordProgram: sonus.recordProgram || "rec",
     verbose: false
   })
+}
 
+const ArecordHelper = {byteCount: 0}
+ArecordHelper.init = (sonus) => {
+  ArecordHelper.track(sonus)
+}
+
+ArecordHelper.track = (sonus) => {
+  sonus.mic.on('data', data => {
+    ArecordHelper.byteCount += data.length
+
+    // When we get to arecord wav file limit, reset
+    if(ArecordHelper.byteCount > ARECORD_FILE_LIMIT){
+      ArecordHelper.restart(sonus)
+    }
+  })
+}
+
+ArecordHelper.restart = (sonus) => {
+  sonus.mic.unpipe(sonus.detector)
+  record.stop()
+
+  // Restart the audio recording
+  sonus.mic = Recorder(sonus)
+  ArecordHelper.byteCount = 0
+  ArecordHelper.track(sonus)
   sonus.mic.pipe(sonus.detector)
-  sonus.started = true
 }
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
