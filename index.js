@@ -85,6 +85,7 @@ Sonus.init = (options, recognizer) => {
     sonus = new stream.Writable(),
     csr = CloudSpeechRecognizer.init(recognizer)
   sonus.mic = {}
+  sonus.isPaused = false
   sonus.recordProgram = opts.recordProgram
   sonus.device = opts.device
   sonus.started = false
@@ -124,6 +125,7 @@ Sonus.init = (options, recognizer) => {
   })
 
   sonus.trigger = (index, hotword) => {
+    if (sonus.isPaused) return
     if (sonus.started) {
       try {
         let triggerHotword = (index == 0) ? hotword : models.lookup(index)
@@ -138,11 +140,13 @@ Sonus.init = (options, recognizer) => {
   }
 
   sonus.pause = () => {
-    record.pause()
+    // record.pause()
+    sonus.isPaused = true
   }
 
   sonus.resume = () => {
-    record.resume()
+    // record.resume()
+    sonus.isPaused = false
   }
 
   return sonus
@@ -197,9 +201,9 @@ ArecordHelper.restart = (sonus) => {
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
 
-Sonus.pause = () => record.pause()
+// Sonus.pause = () => record.pause()
 
-Sonus.resume = () => record.resume()
+// Sonus.resume = () => record.resume()
 
 Sonus.stop = () => record.stop()
 
