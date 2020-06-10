@@ -122,17 +122,16 @@ Sonus.init = (options, recognizer) => {
     })
 
     sonus.trigger = (index, hotword) => {
-      if (sonus.started) {
-        try {
-          let triggerHotword = (index == 0) ? hotword : models.lookup(index)
-          sonus.emit('hotword', index, triggerHotword)
-          CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
-        } catch (e) {
-          throw ERROR.INVALID_INDEX
-        }
-      } else {
-        throw ERROR.NOT_STARTED
+    if (sonus.started) {
+      try {
+        let triggerHotword = (index == 0) ? hotword : models.lookup(index)
+        sonus.emit('hotword', index, triggerHotword)
+        CloudSpeechRecognizer.startStreaming(opts, sonus.mic, csr)
+      } catch (e) {
+        throw ERROR.INVALID_INDEX
       }
+    } else {
+      throw ERROR.NOT_STARTED
     }
   }
 
