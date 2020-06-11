@@ -134,6 +134,7 @@ Sonus.init = (options, recognizer) => {
       throw ERROR.NOT_STARTED
     }
   }
+}
 
   // Handel speech recognition requests
   csr.on('error', error => sonus.emit('error', { streamingError: error }))
