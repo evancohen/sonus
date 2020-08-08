@@ -197,13 +197,14 @@ ArecordHelper.track = (sonus) => {
 }
 
 ArecordHelper.restart = (sonus) => {
+  // reset the counter before we get another buffer of data over the limit
+  ArecordHelper.byteCount = 0
   if(sonus.opts.hotwords!==-1)
     sonus.mic.unpipe(sonus.detector)
   record.stop()
 
   // Restart the audio recording
   sonus.mic = Recorder(sonus)
-  ArecordHelper.byteCount = 0
   ArecordHelper.track(sonus)
   if(sonus.opts.hotwords!==-1)
     sonus.mic.pipe(sonus.detector)
