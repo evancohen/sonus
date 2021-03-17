@@ -28,7 +28,7 @@
   "dependencies": {
     "@google-cloud/speech": "^4.2.0",
     "node-record-lpcm16": "^0.3.1",
-    "snowboy": "1.3.1-alpha.1"
+    "snowboy": "git+https://github.com/leon-ai/snowboy.git",
   },
   "devDependencies": {
     "eslint": "^3.7.0"
