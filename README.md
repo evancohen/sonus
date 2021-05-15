@@ -95,8 +95,9 @@ hotword. Hotword training must occur online through their web service.
 
 ## Built [#withsonus](https://twitter.com/hashtag/withsonus?src=github)
 - [L.I.S.A. - Home automation project](https://github.com/mylisabox/lisa-box)
+- [ioBroker - Home automation project](https://github.com/ioBroker/ioBroker.sonus)
 
-*If you've build a project with Sonus send a PR and include it here!*
+*If you've build a project with Sonus [send a PR](https://github.com/evancohen/sonus/edit/master/README.md) and include it here!*
 
 ## Authors
 Evan Cohen: [@_evnc](https://twitter.com/_evnc)  
