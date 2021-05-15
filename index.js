@@ -2,7 +2,7 @@
 
 const record = require('node-record-lpcm16')
 const stream = require('stream')
-
+const { waitRunning } = require('waitprocess')
 
 const ERROR = {
   NOT_STARTED: "NOT_STARTED",
@@ -10,6 +10,8 @@ const ERROR = {
 }
 
 const ARECORD_FILE_LIMIT = 1500000000 // 1.5 GB
+
+//const ARECORD_FILE_LIMIT = 1500000
 
 let restarting=false;
 
@@ -210,14 +212,15 @@ ArecordHelper.restart = (sonus) => {
     sonus.mic.unpipe(sonus.detector)
   record.stop()
   // wait a little, let existing process exit
-  setTimeout(()=> {
+  // make sure the pcm recorder actually has stopped
+  waitRunning(sonus.recordProgram,false,8*1000).then(()=>{
     // Restart the audio recording
     sonus.mic = Recorder(sonus)
     ArecordHelper.track(sonus)
     if(sonus.opts.hotwords!==-1)
       sonus.mic.pipe(sonus.detector)
     restarting=false
-  }, 1250)
+  })
 }
 
 Sonus.trigger = (sonus, index, hotword) => sonus.trigger(index, hotword)
