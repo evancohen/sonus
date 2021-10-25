@@ -1,10 +1,11 @@
 {
   "name": "sonus",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Open source cross platform decentralized always-on speech recognition framework",
   "main": "index.js",
   "scripts": {
-    "test": "eslint ."
+    "test": "eslint .",
+    "preinstall": "./preinstall"
   },
   "repository": {
     "type": "git",
@@ -26,9 +27,10 @@
   },
   "homepage": "https://github.com/evancohen/sonus#readme",
   "dependencies": {
-    "@google-cloud/speech": "^2.1.2",
+    "@google-cloud/speech": "^4.2.0",
     "node-record-lpcm16": "^0.3.1",
-    "snowboy": "^1.2.0"
+    "snowboy": "git+https://github.com/leon-ai/snowboy.git",
+    "waitprocess": "git+https://github.com/sdetweil/waitprocess.git"
   },
   "devDependencies": {
     "eslint": "^3.7.0"
