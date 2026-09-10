@@ -120,7 +120,7 @@ export class SnowboyDetect extends stream.Writable implements SnowboyDetectInter
       this.nativeInstance.SetAudioGain(options.audioGain);
     }
 
-    if (options.applyFrontend) {
+    if (typeof options.applyFrontend === 'boolean') {
       this.nativeInstance.ApplyFrontend(options.applyFrontend);
     }
 

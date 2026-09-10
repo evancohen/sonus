@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import * as stream from 'stream';
 export interface HotwordModel {
     file: string;

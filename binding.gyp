@@ -44,7 +44,7 @@
             }]
         ],
         'cflags': [
-            '-std=c++11',
+            '-std=c++17',
             '-fexceptions',
             '-Wall',
             '-D_GLIBCXX_USE_CXX11_ABI=0'
@@ -66,7 +66,7 @@
             'MACOSX_DEPLOYMENT_TARGET': '10.11',
             "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
             'OTHER_CFLAGS': [
-                '-std=c++11',
+                '-std=c++17',
                 '-stdlib=libc++'
             ]
         }

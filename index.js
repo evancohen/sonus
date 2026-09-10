@@ -112,7 +112,7 @@ Sonus.init = (options, recognizer) => {
     // defaults
     opts.models = models
     opts.resource = opts.resource || 'node_modules/sonus/resources/common.res'
-    opts.audioGain = opts.audioGain || 2.0
+    opts.audioGain = opts.audioGain != null ? opts.audioGain : 1.0
     opts.language = opts.language || 'en-US' //https://cloud.google.com/speech/docs/languages
 
     const detector = sonus.detector = new Detector(opts)
