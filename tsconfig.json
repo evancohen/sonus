@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": false,
+        "emitDecoratorMetadata": false,
+        "declaration": true,
+        "noImplicitAny": true,
+        "noImplicitUseStrict": false,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "skipLibCheck": true,
+        "ignoreDeprecations": "5.0"
+    },
+    "files": [
+      "snowboy/lib/node/index.ts",
+      "snowboy/lib/node/node-pre-gyp.d.ts",
+      "snowboy/lib/node/SnowboyDetectNative.d.ts"
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}

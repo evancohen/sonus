@@ -1,6 +1,8 @@
+.DS_Store
 # Logs
 logs
 *.log
+.editorconfig
 npm-debug.log*
 
 # Runtime data
@@ -42,3 +44,8 @@ jspm_packages
 # Keyfile
 keyfile.json
 /.idea/
+snowboy/lib/node/index.js
+snowboy/lib/node/binding/
+/components/lib/node/binding/Release/node-v127-linux-x64/snowboy.node
+
+build/

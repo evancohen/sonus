@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+# Prebuilt tarballs are not published for modern Node ABIs; always allow source build.
+if ! ./node_modules/.bin/node-pre-gyp install --fallback-to-build; then
+  echo "sonus: node-pre-gyp failed, trying node-gyp rebuild"
+  npx node-gyp rebuild
+fi
+# Compile TS bindings used by require('./snowboy/lib/node/index.js')
+if command -v tsc >/dev/null 2>&1 || [ -x ./node_modules/.bin/tsc ]; then
+  ./node_modules/.bin/tsc -p ./tsconfig.json
+fi

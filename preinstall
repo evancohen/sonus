@@ -1,0 +1,24 @@
+#!/bin/bash
+# Non-interactive dependency check for snowboy build.
+mac=$(uname -s)
+if [ "$mac" = "Darwin" ]; then
+  exit 0
+fi
+need=()
+for pkg in libatlas-base-dev sox build-essential; do
+  if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+    need+=("$pkg")
+  fi
+done
+if [ ${#need[@]} -eq 0 ]; then
+  exit 0
+fi
+if [ -t 1 ] && command -v sudo >/dev/null 2>&1; then
+  sudo apt-get install -y libmagic-dev libatlas-base-dev sox libsox-fmt-all build-essential || true
+else
+  echo "sonus preinstall: missing packages: ${need[*]}"
+  echo "Install with: sudo apt-get install -y libmagic-dev libatlas-base-dev sox libsox-fmt-all build-essential"
+fi
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "sonus preinstall: python3 is required for node-gyp"
+fi
