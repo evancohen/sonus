@@ -1,0 +1,4 @@
+.github/
+candidate-snowboy/
+node_modules/
+*.tgz

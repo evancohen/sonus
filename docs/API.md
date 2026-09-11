@@ -40,7 +40,7 @@ const language = "en-US"
 ### Initialize Sonus
 Sonus's initialization accepts two paramaters:  
 **`options`** - an options object that contains your hotwords, language, etc  
- - **`hotwords`** - an array of recognizable hotwords
+ - **`hotwords`** - a non-empty array of recognizable hotwords, or `-1` for conversational mode without a hotword detector
  - `language` - streaming language recognition
  - `speechContexts` - Array of strings containing words/phrases so that the speech recognizer is more likely to recognize them.
  - `recordProgram` - (default `'rec'`) Supports:
@@ -65,7 +65,7 @@ Sonus.start(sonus)
 
 ### Pause recognition
 Pass your initialized sonus object into `Sonus.pause`.
-Pausing recognition while streaming will not cancel the request, instead it will cause it to simulate the "end" of speech and return final results.
+Pausing stops microphone consumption and ends the active cloud request. Its pending transcript is discarded.
 **Example:**
 ``` javascript
 Sonus.pause(sonus)
@@ -84,7 +84,7 @@ If you want to stop recognition enterly you can use `Sonus.stop`
 ``` javascript
 Sonus.stop(sonus)
 ```
-Note that after recognition is stopped it can not be started again without creating an enterly new sonus instance.
+The instance can be started again after the recorder child process has closed.
 
 ### Trigger keyword/hotword manually
 You can manuall trigger a hotword by passing your initialized sonus object and an index into `Sonus.trigger`
@@ -117,3 +117,29 @@ hotword
 partial-result
 final-result
 error
+
+### Recording lifecycle and conversational mode
+
+The recording dependency supports one microphone process at a time. Starting
+an already-running instance does not spawn another process; starting a different
+instance while the recorder is occupied throws an error. `Sonus.stop(sonus)`
+clears recognition state and stops that instance. For compatibility with older
+examples, `Sonus.stop()` stops the active instance. Calls on an inactive instance
+cannot stop another instance's recording. Wait for the returned child process's
+`close` event before starting again; starting while it is stopping throws.
+
+`Sonus.pause(sonus)` pauses microphone consumption and ends the current cloud
+request. `Sonus.resume(sonus)` resumes consumption. These also accept no argument
+for the active instance, and are available as `sonus.pause()` / `sonus.resume()`.
+
+For conversational recognition, use `Sonus.init({ hotwords: -1 }, client)`.
+`Sonus.start(sonus)` records one cloud-recognized phrase. After `final-result`,
+call `Sonus.start(sonus)` or `Sonus.trigger(sonus)` to request the next phrase
+without restarting the microphone. Language defaults to `en-US` in both modes.
+Stopping cancels an active request and any pending recorder restart.
+
+Listen for `error` events. Cloud errors are exposed as `{ streamingError }`,
+recorder errors as `{ recordingError }`, and native detector errors as
+`{ detectionError }`. A recorder that does not exit within eight seconds reports
+an error and will not restart automatically. Sonus only stops its own recorder
+child; it does not search for or kill other processes by name.

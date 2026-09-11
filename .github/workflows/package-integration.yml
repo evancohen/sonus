@@ -1,0 +1,74 @@
+name: Standalone Snowboy integration
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['14.21.3', '20', '22']
+    env:
+      npm_config_python: /usr/bin/python3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: evancohen/snowboy
+          ref: 45c0054275c3c41a8e531ab28686f959ef8195b2
+          path: candidate-snowboy
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install native prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 libatlas-base-dev
+      - name: Check recording and recognition lifecycle regressions
+        run: node .github/check-lifecycle.js
+      # Test the unpublished candidate without changing Sonus's dependency range.
+      - name: Pack Snowboy candidate
+        working-directory: candidate-snowboy
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run build
+          npm pack --ignore-scripts
+      - name: Install both packages as a consumer
+        env:
+          SONUS_COMMIT: ${{ github.sha }}
+        run: |
+          mkdir "$RUNNER_TEMP/sonus-consumer"
+          cd "$RUNNER_TEMP/sonus-consumer"
+          npm init -y
+          npm install --no-audit --no-fund "$GITHUB_WORKSPACE/candidate-snowboy/snowboy-1.4.0-rc.0.tgz"
+          npm install --no-audit --no-fund "git+https://github.com/evancohen/sonus.git#$SONUS_COMMIT"
+          node <<'NODE'
+          'use strict'
+          
+          const assert = require('assert')
+          const path = require('path')
+          const root = path.dirname(require.resolve('sonus/package.json'))
+          const Sonus = require(root)
+          const sonus = Sonus.init({ applyFrontend: false }, {})
+          assert.strictEqual(sonus.detector.sampleRate(), 16000)
+          assert.strictEqual(sonus.detector.numHotwords(), 1)
+          const result = sonus.detector.runDetection(Buffer.alloc(3200))
+          assert.ok(result === -2 || result === 0)
+          sonus.detector.destroy()
+          sonus.csr.destroy()
+          sonus.destroy()
+          const conversation = Sonus.init({ hotwords: -1 }, {})
+          assert.strictEqual(conversation.detector, undefined)
+          conversation.csr.destroy()
+          conversation.destroy()
+          console.log('Sonus with standalone Snowboy integration passed')
+          NODE
