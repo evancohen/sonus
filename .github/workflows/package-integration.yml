@@ -1,0 +1,52 @@
+name: Standalone Snowboy integration
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['14.21.3', '20', '22']
+    env:
+      npm_config_python: /usr/bin/python3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: evancohen/snowboy
+          ref: 1c91795e8f3fed9692402b2c30dcc117d0c1ee4e
+          path: candidate-snowboy
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install native prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 libatlas-base-dev
+      # Test the unpublished candidate without changing Sonus's dependency range.
+      - name: Pack Snowboy candidate
+        working-directory: candidate-snowboy
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run build
+          npm pack --ignore-scripts
+      - name: Install both packages as a consumer
+        env:
+          SONUS_COMMIT: ${{ github.sha }}
+        run: |
+          mkdir "$RUNNER_TEMP/sonus-consumer"
+          cd "$RUNNER_TEMP/sonus-consumer"
+          npm init -y
+          npm install --no-audit --no-fund "$GITHUB_WORKSPACE/candidate-snowboy/snowboy-1.4.0-rc.0.tgz"
+          npm install --no-audit --no-fund "git+https://github.com/evancohen/sonus.git#$SONUS_COMMIT"
+          node "$GITHUB_WORKSPACE/test/package-integration.js"
