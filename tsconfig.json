@@ -15,7 +15,6 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
         "skipLibCheck": true,
         "ignoreDeprecations": "5.0"
     },

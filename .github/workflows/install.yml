@@ -1,0 +1,42 @@
+name: Install
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Consumer install (Node ${{ matrix.node }})
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['14.21.3', '20']
+    env:
+      npm_config_python: /usr/bin/python3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install native prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 libatlas-base-dev libmagic-dev sox libsox-fmt-all
+      - name: Install in a clean consumer and test native bindings
+        env:
+          SONUS_COMMIT: ${{ github.sha }}
+        run: |
+          mkdir "$RUNNER_TEMP/sonus-consumer"
+          cd "$RUNNER_TEMP/sonus-consumer"
+          npm init -y
+          npm install --no-audit --no-fund "git+https://github.com/evancohen/sonus.git#$SONUS_COMMIT"
+          node "$GITHUB_WORKSPACE/test/install-smoke.js"
