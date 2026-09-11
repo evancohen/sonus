@@ -33,6 +33,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3 libatlas-base-dev
+      - name: Check recording and recognition lifecycle regressions
+        run: node .github/check-lifecycle.js
       # Test the unpublished candidate without changing Sonus's dependency range.
       - name: Pack Snowboy candidate
         working-directory: candidate-snowboy
